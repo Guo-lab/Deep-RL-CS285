@@ -1,0 +1,71 @@
+\documentclass[10pt]{article}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[margin=0.75in]{geometry}
+\usepackage[font=small,skip=4pt]{caption}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\setlength{\textfloatsep}{6pt}
+\setlength{\floatsep}{4pt}
+\setlength{\intextsep}{6pt}
+
+\begin{document}
+
+\section*{Q2: DAgger}
+
+\subsection*{Numerical Results Summary}
+\vspace{-0.5em}
+\begin{table}[h]
+    \centering
+    \small
+    \begin{tabular}{lrrrr}
+        \toprule
+        Environment    & Expert  & BC      & DAgger (Final)      & Improvement \\
+        \midrule
+        Ant-v4         & 4681.89 & 4699.91 & 4742.55 $\pm$ 5.59  & +0.9\%      \\
+        HalfCheetah-v4 & 4034.80 & 4008.57 & 4055.00 $\pm$ 45.97 & +1.2\%      \\
+        Hopper-v4      & 3717.51 & 1227.66 & 3717.14 $\pm$ 10.78 & +202.8\%    \\
+        Walker2d-v4    & 5383.31 & 2629.40 & 5284.83 $\pm$ 73.11 & +101.0\%    \\
+        \bottomrule
+    \end{tabular}
+    \caption{Summary of DAgger results compared to Expert and BC baselines. DAgger values show mean $\pm$ std across seeds. Improvement shows percentage change from BC baseline.}
+    \label{tab:dagger_results}
+\end{table}
+
+\subsection*{Learning Curves}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{plots/dagger_learning_curve_ant_v4.png}
+    \caption{\textbf{DAgger Learning Curve for Ant-v4.} The plot shows mean return over 3 seeds with error bars (standard deviation). Network architecture: 2-layer MLP with 64 hidden units per layer. Training: 1000 gradient steps per iteration, batch size 1000. Final DAgger performance: 4742.55 $\pm$ 5.59. BC baseline: 4699.91. Expert performance: 4681.89.}
+    \label{fig:ant_v4}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{plots/dagger_learning_curve_halfcheetah_v4.png}
+    \caption{\textbf{DAgger Learning Curve for HalfCheetah-v4.} Final DAgger performance: 4055.00 $\pm$ 45.97. BC baseline: 4008.57. Expert performance: 4034.80.}
+    \label{fig:halfcheetah_v4}
+\end{figure}
+
+\vspace{-4em}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{plots/dagger_learning_curve_hopper_v4.png}
+    \caption{\textbf{DAgger Learning Curve for Hopper-v4.} Final DAgger performance: 3717.14 $\pm$ 10.78. BC baseline: 1227.66. Expert performance: 3717.51.}
+    \label{fig:hopper_v4}
+\end{figure}
+
+\vspace{-1em}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{plots/dagger_learning_curve_walker2d_v4.png}
+    \caption{\textbf{DAgger Learning Curve for Walker2d-v4.} Final DAgger performance: 5284.83 $\pm$ 73.11. BC baseline: 2629.40. Expert performance: 5383.31.}
+    \label{fig:walker2d_v4}
+\end{figure}
+
+
+
+\end{document}

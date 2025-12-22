@@ -1,0 +1,130 @@
+\documentclass[9pt]{article}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[margin=0.3in]{geometry}
+\usepackage[font=small,skip=2pt]{caption}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\abovecaptionskip}{2pt}
+\setlength{\belowcaptionskip}{2pt}
+\setlength{\textfloatsep}{5pt}
+\setlength{\intextsep}{5pt}
+
+\begin{document}
+
+\title{Q1 Tables}
+\author{Siqi Guo}
+\date{}
+\maketitle
+
+Under the folder hw1..., run the following commands to generate the tables
+\begin{verbatim}
+    conda activate cs285
+    ./run_batch_experiments.sh > output.log
+    python analyze_results.py > q1_tables.tex
+\end{verbatim}
+
+\vspace{1.5em}
+\subsection*{\small Effect of Evaluation Batch Size}
+\vspace{1.5em}
+\begin{table}[h]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{llrrr}
+        \toprule
+        Environment                     & Eval Batch Size & Eval Return & Eval Std & Train Return             \\
+        \midrule
+        \multirow{5}{*}{Ant-v4}         & 500             & 4699.91     & 0.00     & \multirow{5}{*}{4681.89} \\
+                                        & 2000            & 4687.74     & 12.16    &                          \\
+                                        & 5000            & 4607.51     & 147.43   &                          \\
+                                        & 10000           & 4625.42     & 148.28   &                          \\
+                                        & 20000           & 4232.01     & 1189.65  &                          \\
+        \cmidrule(lr){2-4}
+        \multirow{5}{*}{HalfCheetah-v4} & 500             & 3754.38     & 0.00     & \multirow{5}{*}{4034.80} \\
+                                        & 2000            & 3829.40     & 75.02    &                          \\
+                                        & 5000            & 3833.50     & 52.09    &                          \\
+                                        & 10000           & 3881.04     & 62.74    &                          \\
+                                        & 20000           & 3844.09     & 83.73    &                          \\
+        \cmidrule(lr){2-4}
+        \multirow{5}{*}{Hopper-v4}      & 500             & 896.78      & 66.58    & \multirow{5}{*}{3717.51} \\
+                                        & 2000            & 972.74      & 206.87   &                          \\
+                                        & 5000            & 902.46      & 200.39   &                          \\
+                                        & 10000           & 893.88      & 177.89   &                          \\
+                                        & 20000           & 894.29      & 197.35   &                          \\
+        \cmidrule(lr){2-4}
+        \multirow{5}{*}{Walker2d-v4}    & 500             & 443.89      & 280.66   & \multirow{5}{*}{5383.31} \\
+                                        & 2000            & 983.07      & 1245.04  &                          \\
+                                        & 5000            & 1557.00     & 1632.10  &                          \\
+                                        & 10000           & 1855.26     & 1713.31  &                          \\
+                                        & 20000           & 1561.11     & 1575.65  &                          \\
+        \bottomrule
+    \end{tabular}
+    \caption{Effect of Evaluation Batch Size}
+\end{table}
+\vspace{-1em}
+
+\newpage
+\subsection*{\small Effect of Training Steps per Iteration}
+\vspace{1.5em}
+\begin{table}[h]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{llrrr}
+        \toprule
+        Environment                     & Train Steps & Eval Return & Eval Std & Train Return             \\
+        \midrule
+        \multirow{6}{*}{Ant-v4}         & 100         & -405.46     & 430.81   & \multirow{6}{*}{4681.89} \\
+                                        & 200         & 87.34       & 136.22   &                          \\
+                                        & 500         & 3935.40     & 93.36    &                          \\
+                                        & 1000        & 4607.51     & 147.43   &                          \\
+                                        & 2000        & 4591.37     & 59.11    &                          \\
+                                        & 4000        & 4627.02     & 89.05    &                          \\
+        \cmidrule(lr){2-4}
+        \multirow{6}{*}{HalfCheetah-v4} & 100         & 211.27      & 137.08   & \multirow{6}{*}{4034.80} \\
+                                        & 200         & 1397.48     & 169.79   &                          \\
+                                        & 500         & 3551.48     & 60.15    &                          \\
+                                        & 1000        & 3833.50     & 52.09    &                          \\
+                                        & 2000        & 3934.79     & 110.73   &                          \\
+                                        & 4000        & 4008.57     & 78.70    &                          \\
+        \cmidrule(lr){2-4}
+        \multirow{6}{*}{Hopper-v4}      & 100         & 210.22      & 164.75   & \multirow{6}{*}{3717.51} \\
+                                        & 200         & 304.11      & 168.52   &                          \\
+                                        & 500         & 1046.30     & 197.08   &                          \\
+                                        & 1000        & 902.46      & 200.39   &                          \\
+                                        & 2000        & 1148.26     & 169.45   &                          \\
+                                        & 4000        & 1227.66     & 165.64   &                          \\
+        \cmidrule(lr){2-4}
+        \multirow{6}{*}{Walker2d-v4}    & 100         & 138.25      & 177.82   & \multirow{6}{*}{5383.31} \\
+                                        & 200         & 236.95      & 302.46   &                          \\
+                                        & 500         & 463.08      & 494.32   &                          \\
+                                        & 1000        & 1557.00     & 1632.10  &                          \\
+                                        & 2000        & 2281.05     & 2401.67  &                          \\
+                                        & 4000        & 2629.40     & 1799.58  &                          \\
+        \bottomrule
+    \end{tabular}
+    \caption{Effect of Training Steps per Iteration}
+\end{table}
+\vspace{-1em}
+
+\subsection*{\small Best Performance by Environment}
+\vspace{1.5em}
+\begin{table}[h]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{lrl}
+        \toprule
+        Environment    & Best Eval Return & Configuration     \\
+        \midrule
+        Ant-v4         & 4699.91          & eval\_bs=500      \\
+        HalfCheetah-v4 & 4008.57          & train\_steps=4000 \\
+        Hopper-v4      & 1227.66          & train\_steps=4000 \\
+        Walker2d-v4    & 2629.40          & train\_steps=4000 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Best Performance by Environment}
+\end{table}
+
+\end{document}
