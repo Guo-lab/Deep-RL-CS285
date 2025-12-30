@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(pip install:*)",
+      "Bash(mv:*)",
+      "Bash(python analysis.py:*)",
+      "Bash(python plot_variance.py:*)",
+      "Bash(conda env list:*)",
+      "Bash(source /home/siqi/anaconda3/bin/activate:*)",
+      "Bash(python:*)"
+    ]
+  }
+}

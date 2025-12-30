@@ -1,0 +1,590 @@
+\documentclass{article}
+\usepackage{xcolor}
+\usepackage{titleps}
+\usepackage[letterpaper, margin=0.7in]{geometry}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{tabu}
+\usepackage{parskip}
+\usepackage{natbib}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{quiver}
+
+\newcommand{\xb}{\mathbf{x}}
+\newcommand{\yb}{\mathbf{y}}
+\newcommand{\wb}{\mathbf{w}}
+\newcommand{\Xb}{\mathbf{X}}
+\newcommand{\Yb}{\mathbf{Y}}
+\newcommand{\tr}{^T}
+\newcommand{\hb}{\mathbf{h}}
+\newcommand{\Hb}{\mathbf{H}}
+
+\DeclareFontShape{OT1}{cmtt}{bx}{n}{<5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
+
+
+\usepackage{forest}
+
+\usepackage{hyperref}
+\usepackage[color=red]{todonotes}
+\usepackage{forest}
+\definecolor{light-yellow}{HTML}{FFE5CC}
+
+\usepackage{cleveref}
+
+\newpagestyle{ruled}
+{\sethead{Berkeley CS 285}{Deep Reinforcement Learning, Decision Making, and Control}{Fall 2023}\headrule
+  \setfoot{}{}{}}
+\pagestyle{ruled}
+
+\renewcommand\makeheadrule{\color{black}\rule[-.75\baselineskip]{\linewidth}{0.4pt}}
+\renewcommand*\footnoterule{}
+
+\begin{document}
+\lstset{basicstyle = \ttfamily,columns=fullflexible,
+    backgroundcolor = \color{light-yellow}
+}
+
+\begin{centering}
+    {\Large Assignment 2: Policy Gradients}
+\end{centering}
+
+
+
+
+
+
+
+
+
+\setcounter{section}{2}
+\section{Policy Gradients}
+
+\subsection{Learning Curves}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imgs/cartpole_small_batch.png}
+        \caption{\small Small Batch (b=1000): Learning curves comparing baseline, reward-to-go (-rtg), advantage normalization (-na), and their combination.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imgs/cartpole_large_batch.png}
+        \caption{\small Large Batch (b=4000): Learning curves. For all plots in this assignment, the x-axis should be number of environment steps, logged as Train\_EnvstepsSoFar (not number of policy gradient iterations)}
+    \end{minipage}
+\end{figure}
+
+\vspace{-1.5em}
+\subsection{Analysis}
+
+\begin{itemize}
+    \item \textbf{Which value estimator has better performance without advantage normalization: the trajectory-centric one, or the one using reward-to-go?}
+
+          Reward-to-go performs significantly better, converging faster with more stable performance near the maximum score of 200. The trajectory-centric estimator shows higher variance and inconsistent performance.
+
+    \item \textbf{Did advantage normalization help?}
+
+          Yes, advantage normalization reduced variance and improved stability in both batch settings, with more pronounced effects in the small batch case due to its inherent higher variance.
+
+    \item \textbf{Did the batch size make an impact?}
+
+          Yes, large batch (b=4000) produced much more stable learning curves with lower variance compared to small batch (b=1000). All large batch configurations reached and maintained the maximum score more consistently.
+\end{itemize}
+
+\subsection{Commands Used}
+
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+        # Small batch experiments
+        python cs285/scripts/run_hw2.py --env_name CartPole-v0 -n 100 -b 1000 \
+        --exp_name cartpole
+        python cs285/scripts/run_hw2.py --env_name CartPole-v0 -n 100 -b 1000 \
+        -rtg --exp_name cartpole_rtg
+        python cs285/scripts/run_hw2.py --env_name CartPole-v0 -n 100 -b 1000 \
+        -na --exp_name cartpole_na
+        python cs285/scripts/run_hw2.py --env_name CartPole-v0 -n 100 -b 1000 \
+        -rtg -na --exp_name cartpole_rtg_na
+
+        # Large batch experiments
+        python cs285/scripts/run_hw2.py --env_name CartPole-v0 -n 100 -b 4000 \
+        --exp_name cartpole_lb
+        python cs285/scripts/run_hw2.py --env_name CartPole-v0 -n 100 -b 4000 \
+        -rtg --exp_name cartpole_lb_rtg
+        python cs285/scripts/run_hw2.py --env_name CartPole-v0 -n 100 -b 4000 \
+        -na --exp_name cartpole_lb_na
+        python cs285/scripts/run_hw2.py --env_name CartPole-v0 -n 100 -b 4000 \
+        -rtg -na --exp_name cartpole_lb_rtg_na
+\end{lstlisting}
+
+
+
+
+
+
+
+
+
+\newpage\section{Neural Network Baseline}
+
+\subsection{Learning Curves}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imgs/halfcheetah_baseline_loss.png}
+        \caption{\small Baseline Loss: The neural network baseline's MSE loss decreases from $\sim$50 to $\sim$20 and stabilizes, indicating successful value function learning.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imgs/halfcheetah_eval_return.png}
+        \caption{\small Eval Return: Pink curve (with baseline) reaches 300+ average return, while cyan curve (no baseline) remains near -100 in given iterations, demonstrating the baseline's significant performance improvement.}
+    \end{minipage}
+\end{figure}
+
+\vspace{-1.5em}
+\subsection{Questions}
+
+\begin{itemize}
+    \item Plot a learning curve for the baseline loss.
+          \textbf{Answer:} See Figure 3 above.
+
+    \item Plot a learning curve for the eval return. You should expect to achieve an average return over 300 for the baselined version.
+          \textbf{Answer:} See Figure 4 above.
+
+    \item Run another experiment with a decreased number of baseline gradient steps (\verb|-bgs|) and/or baseline learning rate (\verb|-blr|). How does this affect (a) the baseline learning curve and (b) the performance of the policy?
+
+          \textbf{Answer:} We varied baseline learning rate with blr $\in \{0.001, 0.005, 0.01\}$ (keeping bgs=5) and baseline gradient steps with bgs $\in \{1, 2, 3, 5\}$ (keeping blr=0.01).
+
+          \begin{figure}[H]
+              \centering
+              \begin{minipage}{0.7\textwidth}
+                  \centering
+                  \begin{minipage}[t]{0.48\textwidth}
+                      \centering
+                      \includegraphics[width=\textwidth]{imgs/halfcheetah_blr_comparison_loss.png}
+                      \caption{\small Baseline Loss Comparison: Orange (blr=0.001) converges slowest to $\sim$40, gray (blr=0.005) to $\sim$25, pink (blr=0.01) fastest to $\sim$20.}
+                  \end{minipage}
+                  \hfill
+                  \begin{minipage}[t]{0.48\textwidth}
+                      \centering
+                      \includegraphics[width=\textwidth]{imgs/halfcheetah_blr_comparison_return.png}
+                      \caption{\small Policy Performance: Pink (blr=0.01) reaches 500+, gray (blr=0.005) $\sim$200, orange (blr=0.001) near 30.}
+                  \end{minipage}
+              \end{minipage}
+          \end{figure}
+          \vspace{-1.5em}
+          \newpage
+          We also varied baseline gradient steps with bgs $\in \{1, 2, 3, 5\}$ while keeping blr=0.01.
+
+          \begin{figure}[H]
+              \centering
+              \begin{minipage}{0.7\textwidth}
+                  \centering
+                  \begin{minipage}[t]{0.48\textwidth}
+                      \centering
+                      \includegraphics[width=\textwidth]{imgs/halfcheetah_bgs_comparison_loss.png}
+                      \caption{\small Baseline Loss (varying bgs): Orange (bgs=1) converges slowest, all others (bgs=2,3,5) converge similarly to $\sim$20.}
+                  \end{minipage}
+                  \hfill
+                  \begin{minipage}[t]{0.48\textwidth}
+                      \centering
+                      \includegraphics[width=\textwidth]{imgs/halfcheetah_bgs_comparison_return.png}
+                      \caption{\small Policy Performance (varying bgs): Pink (bgs=5) and purple (bgs=3) reach 300+, others lower.}
+                  \end{minipage}
+              \end{minipage}
+          \end{figure}
+          \vspace{-1.5em}
+          Lower blr and fewer bgs both result in slower convergence and higher final loss.
+
+    \item \textbf{Optional:} Add \verb|-na| back to see how much it improves things. Also, set \verb|video_log_freq 10|, then open TensorBoard and go to the ``Images'' tab to see some videos of your HalfCheetah walking along!
+\end{itemize}
+
+\subsection{Commands Used}
+
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+        # Section 4: Using a Neural Network Baseline
+        # Experiment 2: HalfCheetah-v4
+
+        # No baseline
+        python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 \
+        -n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 --exp_name cheetah --which_gpu 0
+
+        # Baseline
+        python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 -n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+        --use_baseline -blr 0.01 -bgs 5 --exp_name cheetah_baseline --which_gpu 0
+\end{lstlisting}
+
+
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+        # Section 4: Grid search over baseline learning rate (blr)
+        # Keep baseline gradient steps fixed at 5
+        # Vary blr to see effect on baseline learning and policy performance
+
+        # Baseline learning rate = 0.001 (very low)
+        python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 -n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+        --use_baseline -blr 0.001 -bgs 5 --exp_name cheetah_baseline_blr0.001
+
+        # Baseline learning rate = 0.005
+        python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 -n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+        --use_baseline -blr 0.005 -bgs 5 --exp_name cheetah_baseline_blr0.005
+\end{lstlisting}
+
+
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+        # Baseline gradient steps = 1 (very low)
+        python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 -n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+        --use_baseline -blr 0.01 -bgs 1 --exp_name cheetah_baseline_bgs1
+
+        # Baseline gradient steps = 2
+        python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 -n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+        --use_baseline -blr 0.01 -bgs 2 --exp_name cheetah_baseline_bgs2
+
+        # Baseline gradient steps = 3
+        python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 -n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+        --use_baseline -blr 0.01 -bgs 3 --exp_name cheetah_baseline_bgs3
+\end{lstlisting}
+
+
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+        # Optional: Baseline with advantage normalization and video logging
+        python cs285/scripts/run_hw2.py --env_name HalfCheetah-v4 -n 100 -b 5000 -rtg --discount 0.95 -lr 0.01 \
+        --use_baseline -blr 0.01 -bgs 5 -na --video_log_freq 10 --exp_name cheetah_baseline_na_video
+\end{lstlisting}
+
+
+
+
+\newpage\section{Generalized Advantage Estimation}
+\begin{itemize}
+    \item Provide a single plot with the learning curves for the \verb|LunarLander-v2| experiments that you tried. Describe in words how $\lambda$ affected task performance. The run with the best performance should achieve an average score close to 200 (180+).
+    \item Consider the parameter $\lambda$. What does $\lambda = 0$ correspond to? What about $\lambda = 1$? Relate this to the task performance in \verb|LunarLander-v2| in one or two sentences.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imgs/lunar_lander_baseline_loss.png}
+        \caption{\small Baseline Loss: All configurations converge.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imgs/lunar_lander_eval_return.png}
+        \caption{\small Eval Return: Higher $\lambda$ values ($\lambda=0.98$, $\lambda=0.99$, $\lambda=1$) achieve 180-200+ average return. Lower $\lambda$ values show degraded performance} %, with $\lambda=0$ remaining near -100. Higher $\lambda$ (favoring Monte Carlo returns) performs better for this sparse-reward environment.}
+    \end{minipage}
+\end{figure}
+
+\textbf{Answer:} The parameter $\lambda$ critically affects performance through the bias-variance tradeoff. Performance ranking from best to worst: $\lambda=0.98$-$0.99$ (blue, green: 180-200+) $>$ $\lambda=1$ (orange: 100-150) $>$ $\lambda=0.95$ (light orange) $>$ $\lambda=0$ (pink: -100).
+
+The optimal performance at intermediate values $\lambda \in \{0.98, 0.99\}$ demonstrates the \textbf{key insight of GAE}. Both extremes are suboptimal: $\lambda=0$ suffers from high bias due to relying entirely on bootstrapped value estimates and provides poor credit assignment in this sparse-reward environment (only looks one step ahead). Conversely, $\lambda=1$ (pure Monte Carlo) has excessive variance from long trajectory rollouts, leading to noisy gradients and unstable learning. The sweet spot at $\lambda=0.98$-$0.99$ captures long-horizon returns for proper credit assignment while incorporating slight TD bootstrapping to reduce variance, achieving the best bias-variance tradeoff.
+
+$\lambda = 0$ corresponds to the one-step TD advantage estimator (high bias, low variance), while $\lambda = 1$ corresponds to pure Monte Carlo using full trajectory returns (low bias, high variance).
+% The superior performance of intermediate $\lambda$ values over both extremes validates the GAE framework: gradually increasing $\lambda$ from 0 improves performance by reducing bias and incorporating more actual rewards, but pushing all the way to $\lambda=1$ introduces too much variance, degrading learning efficiency.
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage\section{Hyperparameter Tuning}
+\begin{enumerate}
+    \item Provide a set of hyperparameters that achieve high return on \verb|InvertedPendulum-v4| in as few environment steps as possible.
+    \item Show learning curves for the average returns with your hyperparameters and with the default settings, with environment steps on the $x$-axis. Returns should be averaged over 5 seeds. \\
+\end{enumerate}
+
+First, train a policy for the inverted pendulum problem without GAE
+and with otherwise default settings.
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+                for seed in $(seq 1 5); do
+                    python cs285/scripts/run_hw2.py --env_name InvertedPendulum-v4 -n 100 \
+                    --exp_name pendulum_default_s$seed \
+                    -rtg --use_baseline -na \
+                    --batch_size 5000 \
+                    --seed $seed
+                done
+            \end{lstlisting}
+
+
+During training, we have to choose many hyperparameters and settings:
+\begin{enumerate}[noitemsep,topsep=1pt]
+    \item \textbf{Discount factor} ($\gamma$): Controls the horizon of future rewards considered.
+    \item \textbf{Network architecture}: Number of layers and hidden units per layer.
+    \item \textbf{Batch size}: Small batches introduce high variance but enable frequent updates; large batches waste samples as the entire batch must be recollected for each gradient step.
+    \item \textbf{Learning rate}: Step size for policy parameter updates.
+    \item \textbf{Return-to-go}: Whether to use causal advantage estimation by computing returns from the current timestep onward.
+    \item \textbf{Advantage normalization}: Whether to normalize advantages to unit variance for stable training.
+    \item \textbf{GAE}: Whether to use Generalized Advantage Estimation, and if so, what $\lambda$ value to balance bias-variance tradeoff.
+\end{enumerate}
+
+The detailed hyperparameter tuning process is included in the section 6 scripts, and the final selected hyperparameters are the uncommented ones in \verb|section6_tuned.sh|:
+
+Different tuned parameters gave the plots below:
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.7\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imgs/pendulum_tuning_comparison.png}
+        \caption{\small Hyperparameter Tuning Results: Comparison of different configurations on InvertedPendulum-v4. Cyan and green curves (tuned configurations) converge to maximum return around step 25-30 and maintain stability, while the gray curve (default configuration) requires ~60 steps to converge.}
+    \end{minipage}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage\section{(Extra Credit) Humanoid}
+\begin{enumerate}
+    \item Plot a learning curve for the Humanoid-v4 environment. You should expect to achieve an average return of at least 600 by the end of training. Discuss what changes, if any, you made to complete this problem (for example: optimizations to the original code, hyperparameter changes, algorithmic changes).
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.7\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{imgs/humanoid_eval_return.png}
+        \caption{\small Humanoid-v4 Training Results: Learning curve showing evaluation return over training steps. The policy achieves an average return of 600+ by the end of training.}
+    \end{minipage}
+\end{figure}
+
+
+
+
+
+
+
+
+% =================================================================================================
+% =================================================================================================
+% =================================================================================================
+\newpage\section{Analysis}
+\label{sec:analysis}
+
+Consider the following infinite-horizon MDP:
+% https://q.uiver.app/#q=WzAsMixbMCwwLCJzIl0sWzAsMSwic19GIl0sWzAsMSwiYV8yIl1d
+\[\begin{tikzcd}
+        s_1 & {s_F}
+        \arrow["{a_2}", from=1-1, to=1-2]
+        \arrow["{a_1}", loop left, from=1-1, to=1-1]
+    \end{tikzcd}\]
+\newcommand{\Rmax}[0]{R_{\textrm{max}}}
+\newcommand{\E}[0]{\mathbb{E}}
+\newcommand{\var}[0]{\textrm{Var}}
+\crefname{question}{part}{parts}
+\Crefname{question}{Part}{Parts}
+\newcommand\question[1][]{\item\refstepcounter{subsection}\label[question]{#1}}
+
+At each step, the agent stays in state $s_1$ and receives reward 1 if it takes action $a_1$, and receives reward 0 and terminates the episode otherwise.
+Parametrize the policy as stationary (not dependent on time) with a single parameter:
+\[\pi_\theta(a_1|s_1) = \theta, \pi_\theta(a_2|s_1) = 1-\theta\]
+
+\begin{enumerate}
+    \question[sec:analysis1] Applying policy gradients
+    \begin{enumerate}
+        \item Use policy gradients to compute the gradient of the expected return $R(\tau)$ with respect to the parameter $\theta$. \textbf{Do not use discounting.}
+
+              \textbf{Hint}: to compute $\sum_{k=1}^\infty k\alpha^{k-1}$, you can write:
+              \[\sum_{k=1}^\infty k\alpha^{k-1} = \sum_{k=1}^\infty \frac{d}{d\alpha}\alpha^k = \frac{d}{d\alpha}\sum_{k=1}^\infty\alpha^k\]
+
+              \textbf{Solution:}
+
+              Using the policy gradient theorem:
+              \[\nabla_\theta \mathbb{E}_{\tau \sim \pi_\theta}[R(\tau)] = \mathbb{E}_{\tau \sim \pi_\theta}\left[R(\tau) \nabla_\theta \log \pi_\theta(\tau)\right]\]
+
+              For a trajectory with $k$ steps (taking $a_1$ exactly $k$ times then $a_2$), we have $\pi_\theta(\tau) = \theta^k(1-\theta)$ and $R(\tau) = k$.
+
+              \begin{equation*}
+                  \begin{aligned}
+                      \nabla_\theta \log \pi_\theta(\tau)               & = \nabla_\theta (k\log\theta + \log(1-\theta)) =  \frac{k}{\theta} - \frac{1}{1-\theta}          \\
+                      \nabla_\theta \log \pi_\theta(\tau) \cdot R(\tau) & = \left(\frac{k}{\theta} - \frac{1}{1-\theta}\right) k = \frac{k^2}{\theta} - \frac{k}{1-\theta}
+                  \end{aligned}
+              \end{equation*}
+
+              $$\nabla_\theta \mathbb{E}_{\tau \sim \pi_\theta}[R(\tau)] = \mathbb{E}\left[\frac{k^2}{\theta} - \frac{k}{1-\theta}\right] = \mathbb{E}\left[\frac{k^2}{\theta}\right] - \mathbb{E}\left[\frac{k}{1-\theta}\right] = \frac{\mathbb{E}[k^2]}{\theta} - \frac{\mathbb{E}[k]}{1-\theta}$$
+
+              From the next part (b), we have $\mathbb{E}[k] = \frac{\theta}{1-\theta}$. Now we compute $\mathbb{E}[k^2]$:
+              \begin{equation*}
+                  \begin{aligned}
+                      \mathbb{E}[k^2] & = \sum_{k=1}^{\infty} k^2 \theta^k(1-\theta) = (1-\theta) \theta \sum_{k=1}^{\infty} k^2 \theta^{k-1}                                                                                                                                                       \\
+                                      & = (1-\theta) \theta \frac{d}{d\theta} \sum_{k=1}^{\infty} k\theta^k \quad \text{(from part (b))} = (1-\theta) \theta \frac{d}{d\theta}\frac{\theta}{(1-\theta)^2} \quad \text{(since } \sum_{k=1}^{\infty} k\theta^k = \frac{\theta}{(1-\theta)^2} \text{)} \\
+                                      & = (1-\theta) \theta \cdot \frac{(1-\theta)^2 - \theta \cdot 2(1-\theta)(-1)}{(1-\theta)^4} = (1-\theta) \theta \cdot \frac{1+\theta}{(1-\theta)^3} = \frac{\theta(1+\theta)}{(1-\theta)^2}
+                  \end{aligned}
+              \end{equation*}
+
+              Substituting back:
+              \begin{equation*}
+                  \begin{aligned}
+                      \nabla_\theta \mathbb{E}[R(\tau)] & = \frac{\mathbb{E}[k^2]}{\theta} - \frac{\mathbb{E}[k]}{1-\theta}                                                 \\
+                                                        & = \frac{1}{\theta} \cdot \frac{\theta(1+\theta)}{(1-\theta)^2} - \frac{1}{1-\theta} \cdot \frac{\theta}{1-\theta} \\
+                                                        & = \frac{1+\theta}{(1-\theta)^2} - \frac{\theta}{(1-\theta)^2} = \frac{1}{(1-\theta)^2}
+                  \end{aligned}
+              \end{equation*}
+
+        \item \label{exact_gradient} Compute the expected return of the policy $\E_{\tau \sim \pi_\theta} R(\tau)$ directly. Compute the gradient of this expression with respect to $\theta$ and verify that this matches the policy gradient.
+
+              \textbf{Solution:}
+              \begin{equation*}
+                  \begin{aligned}
+                      \E_{\tau \sim \pi_\theta} R(\tau)               & = \sum_{k=0}^{\infty} P(\text{trajectory with } k \text{ steps}) \cdot R(\tau) = \sum_{k=0}^{\infty} \theta^k(1-\theta) \cdot k = (1-\theta) \sum_{k=1}^{\infty} k\theta^k = (1-\theta) \cdot \theta \sum_{k=1}^{\infty} k\theta^{k-1} \\
+                                                                      & = (1-\theta) \theta \frac{d}{d\theta}\sum_{k=1}^{\infty}\theta^k                                                                                                                                                                       \\
+                                                                      & = (1-\theta) \theta \frac{d}{d\theta}\frac{\theta}{1-\theta} = (1-\theta) \theta \cdot \frac{1}{(1-\theta)^2} = \frac{\theta}{1-\theta}                                                                                                \\
+                      \nabla_\theta \E_{\tau \sim \pi_\theta} R(\tau) & = \frac{d}{d\theta}\frac{\theta}{1-\theta} = \frac{1}{(1-\theta)^2}
+                  \end{aligned}
+              \end{equation*}
+
+    \end{enumerate}
+    % \newpage
+
+    \vspace{3em}
+    \question[sec:analysis2] Compute the variance of the policy gradient in closed form and describe the properties of the variance with respect to $\theta$. For what value(s) of $\theta$ is variance minimal? Maximal? (Once you have an exact expression for the variance you can eyeball the min/max).
+
+    \textbf{Hint:}  Once you have it expressed as a sum of terms $P(\theta)/Q(\theta)$ where $P$ and $Q$ are polynomials, you can use a symbolic computing program (Mathematica, SymPy, etc) to simplify to a single rational expression.
+
+    \textbf{Solution:}
+
+    From Question 1, the policy gradient estimator for a single trajectory with $k$ steps is:
+    $$\hat{g}(\theta) = \nabla_\theta \log \pi_\theta(\tau) \cdot R(\tau) = \frac{k^2}{\theta} - \frac{k}{1-\theta}$$
+
+    We already computed $\mathbb{E}[\hat{g}(\theta)] = \frac{1}{(1-\theta)^2}$ in Question 1.
+
+    To compute the variance, we use $\text{Var}[\hat{g}] = \mathbb{E}[\hat{g}^2] - (\mathbb{E}[\hat{g}])^2$.
+
+    Compute $\mathbb{E}[\hat{g}^2]$:
+    \begin{align*}
+        \hat{g}^2 & = \left(\frac{k^2}{\theta} - \frac{k}{1-\theta}\right)^2 = \frac{k^4}{\theta^2} - \frac{2k^3}{\theta(1-\theta)} + \frac{k^2}{(1-\theta)^2}
+    \end{align*}
+
+    Taking expectation:
+    \begin{align*}
+        \mathbb{E}[\hat{g}^2] & = \frac{\mathbb{E}[k^4]}{\theta^2} - \frac{2\mathbb{E}[k^3]}{\theta(1-\theta)} + \frac{\mathbb{E}[k^2]}{(1-\theta)^2}
+    \end{align*}
+
+    Using the moments from Question 3 in the next part:
+    \begin{align*}
+        \mathbb{E}[\hat{g}^2] & = \frac{1}{\theta^2} \cdot \frac{\theta(1+11\theta+11\theta^2+\theta^3)}{(1-\theta)^4} - \frac{2}{\theta(1-\theta)} \cdot \frac{\theta(1+4\theta+\theta^2)}{(1-\theta)^3} + \frac{1}{(1-\theta)^2} \cdot \frac{\theta(1+\theta)}{(1-\theta)^2} \\
+                              & = \frac{1+11\theta+11\theta^2+\theta^3}{\theta(1-\theta)^4} - \frac{2\theta(1+4\theta+\theta^2)}{\theta(1-\theta)^4} + \frac{\theta(1+\theta)}{(1-\theta)^4}                                                                                   \\
+                              & = \frac{1+11\theta+11\theta^2+\theta^3 - 2\theta - 8\theta^2 - 2\theta^3 + \theta^2 + \theta^3}{\theta(1-\theta)^4} = \frac{1 + 9\theta + 4\theta^2}{\theta(1-\theta)^4}
+    \end{align*}
+
+    \begin{align*}
+        \text{Var}[\hat{g}(\theta)] & = \mathbb{E}[\hat{g}^2] - (\mathbb{E}[\hat{g}])^2                                                                                  \\
+                                    & = \frac{1 + 9\theta + 4\theta^2}{\theta(1-\theta)^4} - \frac{1}{(1-\theta)^4} = \frac{1 + 8\theta + 4\theta^2}{\theta(1-\theta)^4}
+    \end{align*}
+
+    \begin{itemize}
+        \item Variance is \textbf{minimal} at $\theta \approx 0.107$ (found numerically by setting $\frac{d}{d\theta}\text{Var}[\hat{g}] = 0$)
+        \item Variance is \textbf{maximal} as $\theta \to 0^+$ or $\theta \to 1^-$ (blows up at the boundaries)
+    \end{itemize}
+
+    \newpage
+    \question[sec:analysis3] Apply return-to-go as an advantage estimator.
+    \begin{enumerate}
+        \item Write the modified policy gradient and confirm that it is unbiased.
+
+              \textbf{Solution:}
+
+              Before: $\nabla_\theta \log \pi_\theta(\tau) \cdot R(\tau) = \left(\frac{k}{\theta} - \frac{1}{1-\theta}\right) \cdot k$.
+
+              With return-to-go, instead of multiplying each action's log probability by the total return $R(\tau) = k$, we multiply it by the return from that timestep onward.
+              At timestep $t$ (where $t \in 1, 2, ..., k$), the return-to-go is $(k - t + 1)$ (number of remaining rewards of 1).
+
+
+              The original policy gradient multiplies each action's log probability by the total trajectory return, crediting actions for rewards that occurred before they were taken. Return-to-go only credits each action for  \textbf{rewards from that timestep onward}, respecting \textbf{causality} since an action at time $t$ cannot influence past rewards.
+
+              %This removes spurious correlations and \textbf{reduces variance while remaining unbiased}. \\
+
+              Return-to-go exists to provide an unbiased estimate of the future cumulative reward and removes mis-crediting bias per action
+
+
+        \item Compute the variance of the return-to-go policy gradient and plot it on $[0, 1]$ alongside the variance of the original estimator.
+
+              \textbf{Solution:} Use the variance formula: $\text{Var}(X) = \mathbb{E}[X^2] - (\mathbb{E}[X])^2$
+              $$\hat{g}_{\text{rtg}}(\theta) = \sum_{t=1}^{k} \frac{1}{\theta} \cdot (k - t + 1) = \frac{1}{\theta} \sum_{t=1}^{k} (k - t + 1) = \frac{1}{\theta} \sum_{j=1}^{k} j = \frac{1}{\theta} \frac{k(k+1)}{2} = \frac{k(k+1)}{2\theta}$$
+              %   $$\sum_{t=1}^{k} (k - t + 1) = \sum_{j=1}^{k} j = \frac{k(k+1)}{2}$$
+              %   $$\hat{g}_{\text{rtg}}(\theta) = \frac{k(k+1)}{2\theta}$$
+
+              $$\mathbb{E}[\hat{g}_{\text{rtg}}] = \frac{1}{2\theta} \mathbb{E}[k^2 + k] = \frac{1}{2\theta} \left(\frac{\theta(1+\theta)}{(1-\theta)^2} + \frac{\theta}{1-\theta}\right) = \frac{1}{(1-\theta)^2}$$
+              $$\mathbb{E}[\hat{g}_{\text{rtg}}^2] = \frac{1}{4\theta^2} \mathbb{E}[k^4 + 2k^3 + k^2]$$
+
+              For a geometric distribution with parameter $p = 1-\theta$ (probability of stopping):
+
+              $\mathbb{E}[k] = \frac{\theta}{1-\theta} \qquad$
+              $\mathbb{E}[k^2] = \frac{\theta(1+\theta)}{(1-\theta)^2} \qquad$
+              $\mathbb{E}[k^3] = \frac{\theta(1 + 4\theta + \theta^2)}{(1-\theta)^3} \qquad$
+              $\mathbb{E}[k^4] = \frac{\theta(1 + 11\theta + 11\theta^2 + \theta^3)}{(1-\theta)^4}$
+              \begin{align*}
+                  \mathbb{E}[\hat g_{\mathrm{rtg}}^2]
+                   & = \frac{1}{4\theta^2} \mathbb{E}\big[ K^4 + 2 K^3 + K^2 \big] = \frac{1}{4\theta^2} \Bigg[
+                      \frac{\theta (1 + 11\theta + 11\theta^2 + \theta^3)}{(1-\theta)^4}
+                      + 2 \frac{\theta (1 + 4\theta + \theta^2)}{(1-\theta)^3}
+                      + \frac{\theta (1 + \theta)}{(1-\theta)^2}
+                      \Bigg] = \frac{1 + 4 \theta + \theta^2}{\theta (1-\theta)^4} \,.
+              \end{align*}
+              $$\text{Var}[\hat{g}_{\text{rtg}}] = \mathbb{E}[\hat{g}_{\text{rtg}}^2] - \left(\frac{1}{(1-\theta)^2}\right)^2 = \frac{1 + 4\theta + \theta^2}{\theta(1-\theta)^4} - \frac{1}{(1-\theta)^4} = \frac{1 + 4\theta + \theta^2 - \theta}{\theta(1-\theta)^4} = \frac{1 + 3\theta + \theta^2}{\theta(1-\theta)^4}$$
+
+              \begin{figure}[H]
+                  \centering
+                  \begin{minipage}{0.65\linewidth}
+                      \includegraphics[width=\linewidth]{imgs/variance_comparison.png}
+                      \caption{\small Variance comparison between original and return-to-go policy gradient estimators over $\theta \in [0,1]$. The return-to-go estimator exhibits lower variance.}
+                  \end{minipage}
+              \end{figure}
+
+              %   https://www.wolframalpha.com/input?i=Plot%5B%7B++%281+%2B+3+x+%2B+x%5E2%29%2F%28x+%281+-+x%29%5E4%29%2C+++1%2F%28x+%281+-+x%29%5E2%29+++%7D%2C++%7Bx%2C+0%2C+1%7D+%5D
+
+    \end{enumerate}
+    \newpage
+    \question[sec:analysis4] Consider a finite-horizon $H$-step MDP with sparse reward:
+    % https://q.uiver.app/#q=WzAsNixbMCwwLCJzXzEiXSxbMSwwLCJzXzIiXSxbMiwwLCJzXzMiXSxbMiwxLCJzX0YiXSxbMywwLCJcXGRvdHMiXSxbNCwwLCJzX0giXSxbMCwxLCJhXzEiXSxbMSwyLCJhXzEiXSxbMCwzLCJhXzIiLDJdLFsyLDQsImFfMSJdLFs0LDVdLFsxLDMsImFfMiJdLFsyLDMsImFfMiIsMV0sWzQsMywiYV8yIiwxXV0=
+    \[\begin{tikzcd}
+            {s_1} & {s_2} & {s_3} & \dots & {s_H} \\
+            && {s_F}
+            \arrow["{a_1}", from=1-1, to=1-2]
+            \arrow["{a_1}", from=1-2, to=1-3]
+            \arrow["{a_2}"', from=1-1, to=2-3]
+            \arrow["{a_1}", from=1-3, to=1-4]
+            \arrow[from=1-4, to=1-5]
+            \arrow["{a_2}", from=1-2, to=2-3]
+            \arrow["{a_2}"{description}, from=1-3, to=2-3]
+            \arrow["{a_2}"{description}, from=1-4, to=2-3]
+        \end{tikzcd}\]
+
+    The agent receives reward $\Rmax$ if it arrives at $s_H$ and reward $0$ if it arrives at $s_F$ (a terminal state). In other words, the return for a trajectory $\tau$ is given by:
+    \[R(\tau) = \begin{cases}1 & \tau \textrm{ ends at } s_H \\ 0 & \tau \textrm{ ends at } s_F \end{cases}\]
+    Using the same policy parametrization as above, consider off-policy policy gradients via importance sampling. Assume we want to compute policy gradients for a policy $\pi_\theta$ with samples drawn from $\pi_{\theta'}$.
+    \begin{enumerate}
+        \item Write the policy gradient with importance sampling.
+
+        \item Compute its variance.
+
+    \end{enumerate}
+
+\end{enumerate}
+\end{document}

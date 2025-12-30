@@ -1,0 +1,153 @@
+import itertools
+import logging
+
+import numpy as np
+import torch
+from cs285.infrastructure import pytorch_util as ptu
+from torch import distributions, nn, optim
+from torch.nn import functional as F
+
+logging.basicConfig(level=logging.INFO)  # Set default level to INFO
+logger = logging.getLogger(__name__)
+
+
+class MLPPolicy(nn.Module):
+    """Base MLP policy, which can take an observation and output a distribution over actions.
+
+    This class should implement the `forward` and `get_action` methods. The `update` method should be written in the
+    subclasses, since the policy update rule differs for different algorithms.
+    """
+
+    def __init__(
+        self,
+        ac_dim: int,
+        ob_dim: int,
+        discrete: bool,
+        n_layers: int,
+        layer_size: int,
+        learning_rate: float,
+    ):
+        super().__init__()
+
+        if discrete:
+            self.logits_net = ptu.build_mlp(
+                input_size=ob_dim,
+                output_size=ac_dim,
+                n_layers=n_layers,
+                size=layer_size,
+            ).to(ptu.device)
+            parameters = self.logits_net.parameters()
+        else:
+            self.mean_net = ptu.build_mlp(
+                input_size=ob_dim,
+                output_size=ac_dim,
+                n_layers=n_layers,
+                size=layer_size,
+            ).to(ptu.device)
+            self.logstd = nn.Parameter(
+                torch.zeros(ac_dim, dtype=torch.float32, device=ptu.device)
+            )
+            parameters = itertools.chain([self.logstd], self.mean_net.parameters())
+
+        self.optimizer = optim.Adam(
+            parameters,
+            learning_rate,
+        )
+
+        self.discrete = discrete
+
+    @torch.no_grad()
+    def get_action(self, obs: np.ndarray) -> np.ndarray:
+        """Takes a single observation (as a numpy array) and returns a single action (as a numpy array)."""
+        # (1) TODO: implement get_action
+        obs = ptu.from_numpy(obs)
+
+        dist = self.forward(obs)
+        action = dist.sample()
+
+        action = ptu.to_numpy(action)
+
+        # INFO:cs285.networks.policies:Get action shape after sampling: (1,)
+        logger.debug(f"Get action shape after sampling: {action.shape}")
+
+        return action
+
+    def forward(self, obs: torch.FloatTensor):
+        """
+        This function defines the forward pass of the network.
+        You can return anything you want, but you should be able to differentiate through it.
+        For example, you can return a torch.FloatTensor.
+        You can also return more flexible objects, such as a `torch.distributions.Distribution` object.
+        It's up to you!
+        """
+
+        """
+        A policy network outputs parameters of a probability distribution over actions.
+        
+        For a discrete action space, we can use a categorical distribution. 
+        The policy network outputs a vector of logits,
+        which are the inputs to a softmax function that outputs probabilities for each action.
+        
+        For a continuous action space, we can use a Gaussian distribution. 
+        The policy network outputs a vector of means.
+        """
+
+        if self.discrete:
+            # (1) TODO: define the forward pass for a policy with a discrete action space.
+            logits = self.logits_net(obs)
+            return distributions.Categorical(logits=logits)
+        else:
+            # (1) TODO: define the forward pass for a policy with a continuous action space.
+            mean = self.mean_net(obs)
+            std = torch.exp(self.logstd)
+            return distributions.Normal(mean, std)
+
+    def update(self, obs: np.ndarray, actions: np.ndarray, *args, **kwargs) -> dict:
+        """Performs one iteration of gradient descent on the provided batch of data."""
+        raise NotImplementedError
+
+
+class MLPPolicyPG(MLPPolicy):
+    """Policy subclass for the policy gradient algorithm."""
+
+    # policy gradient Loss = -mean(log_prob(action) * advantage)
+    def update(
+        self,
+        obs: np.ndarray,
+        actions: np.ndarray,
+        advantages: np.ndarray,
+    ) -> dict:
+        """Implements the policy gradient actor update."""
+        obs = ptu.from_numpy(obs)
+        actions = ptu.from_numpy(actions)
+        advantages = ptu.from_numpy(advantages)
+
+        """
+        The policy network (MLP) suggests a probability distribution over actions 
+        given the current observation. The loss guides the network to increase 
+        the probability of actions that led to better-than-expected outcomes and vice versa.
+        
+        The log probability of the action taken represents how likely the policy was 
+        to take that action, and the advantage measures how much better the outcome.
+        With the high advantage, we would push the policy towards taking that action more often.
+        """
+
+        # (2) TODO: implement the policy gradient actor update.
+        dist = self.forward(obs)
+        log_probs = dist.log_prob(actions)
+        if log_probs.ndim > 1:
+            log_probs = log_probs.sum(dim=1)
+
+        logger.debug(f"log_probs shape: {log_probs.shape}")
+        logger.debug(f"actions shape: {actions.shape}")
+        logger.debug(f"advantages shape: {advantages.shape}")
+
+        loss = -torch.mean(log_probs * advantages)
+
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        return {
+            "Actor_Loss": ptu.to_numpy(loss),
+        }
