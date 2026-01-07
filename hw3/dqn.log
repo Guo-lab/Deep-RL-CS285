@@ -1,0 +1,98 @@
+Running Experiment 3: LunarLander Double-Q with multiple seeds...
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_doubleq_06-01-2026_17-48-29
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_doubleq_06-01-2026_18-10-56
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_doubleq_06-01-2026_18-23-30
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_doubleq_06-01-2026_18-45-24
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_doubleq_06-01-2026_18-56-44
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+Experiment 3 completed!
+Running Experiment 2: LunarLander DQN with multiple seeds...
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_06-01-2026_19-25-31
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_06-01-2026_19-38-21
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_06-01-2026_19-48-41
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_06-01-2026_20-35-09
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw3/cs285/scripts/../../data/hw3_dqn_dqn_LunarLander-v2_s64_l2_d0.99_06-01-2026_20-54-38
+########################
+Using GPU id 0
+cuda:0 cuda:0 cuda:0 cuda:0
+Experiment 2 completed!
+
+
+
+(cs285) siqi@siqi-Thin-15-B13VF:~/Desktop/homework_fall2023-main/hw3$ ./dqn_batch.sh > dqn.log
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [22:23<00:00, 223.34it/s]
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [12:30<00:00, 399.74it/s]
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [21:50<00:00, 228.84it/s]
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [11:15<00:00, 443.84it/s]
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [28:44<00:00, 174.01it/s]
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [12:45<00:00, 391.85it/s]
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [10:16<00:00, 486.54it/s]
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [46:24<00:00, 107.75it/s]
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [19:25<00:00, 257.41it/s]
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+100%|██████████████████████████████████████████████████████████████████████████| 300000/300000 [21:07<00:00, 236.73it/s]

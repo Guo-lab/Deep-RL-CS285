@@ -1,0 +1,83 @@
+\usepackage{xcolor}
+\usepackage{titleps}
+\usepackage[letterpaper, margin=0.95in]{geometry}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{tabu}
+\usepackage{parskip}
+\usepackage{natbib}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{forest}
+\usepackage{hyperref}
+\usepackage[color=red]{todonotes}
+\usepackage{forest}
+\definecolor{light-yellow}{HTML}{FFE5CC}
+\usepackage{cleveref}
+
+\newcommand{\xb}{\mathbf{x}}
+\newcommand{\yb}{\mathbf{y}}
+\newcommand{\wb}{\mathbf{w}}
+\newcommand{\Xb}{\mathbf{X}}
+\newcommand{\Yb}{\mathbf{Y}}
+\newcommand{\tr}{^T}
+\newcommand{\hb}{\mathbf{h}}
+\newcommand{\Hb}{\mathbf{H}}
+
+\DeclareFontShape{OT1}{cmtt}{bx}{n}{<5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
+
+\newpagestyle{ruled}
+{\sethead{Berkeley CS 285}{Deep Reinforcement Learning, Decision Making, and Control}{Fall 2022}\headrule
+  \setfoot{}{\ifsolutions\LARGE\bf\textcolor{red}{Answer Key}\fi}{}}
+\pagestyle{ruled}
+
+\renewcommand\makeheadrule{\color{black}\rule[-.75\baselineskip]{\linewidth}{0.4pt}}
+\renewcommand*\footnoterule{}
+
+\begin{document}
+\lstset{basicstyle = \ttfamily,columns=fullflexible,
+  backgroundcolor = \color{light-yellow}
+}
+
+\begin{centering}
+  {\Large Assignment 3: Q-Learning and Actor-Critic Algorithms} \\
+  % \vspace{.25cm}
+  % \textbf{Due October 18, 11:59 pm} \\
+\end{centering}
+
+% \input{hw3_text/01_analysis}
+
+\input{hw3_text/02_dqn}
+\input{hw3_text/04_sac}
+
+% \input{hw3_text/05_submit}
+
+\newpage
+
+\paragraph{SAC-related questions.}
+We wanted to address some of the common questions that have been asked regarding Question 6 of the HW. The full algorithm for SAC is summarized below, the equations listed in this paper will be helpful for you: {\url{https://arxiv.org/pdf/1812.05905}}. Some definitions that will be useful:
+\begin{enumerate}
+  \item What is alpha and how to update it: Alpha is the entropy regularization coefficient denoting how much exploration to add to the policy. You should update based on Eq. 18 in Section 5 in the above paper as follows:
+        $$
+          J(\alpha)=\mathop{\mathbb{E}}_{a_t \sim \pi_t}[-\alpha\log_{\pi_t}(a_t|s_t) - \alpha\bar{\mathcal{H}}].
+        $$
+  \item Target entropy is the negative of the action space dimension that is used to update the alpha term.
+  \item SquashedNorm: This is a function that takes in mean and std as in previous homeworks, and will give you a distribution that you can sample your action from.
+  \item To update the critic, refer to how to update Q-function parameters in Equation 6 of the paper above as follows: \\
+        $$J_{Q}(\theta) = Q_{\theta}(s_t, a_t) - (r(s_t, a_t) + \gamma (Q_{\bar{\theta}}(s_{t+1}, a_{t+1}) - \alpha \log(\pi_{\phi}(a_{t+1}, s_{t+1})))$$
+  \item To update the policy, follow Equation 18: \\
+        $$J(\alpha) = E_{a_t \sim \pi_t} [- \alpha \log \pi_{t}(a_t|s_t) - \alpha \bar{\mathcal{H}}]$$
+  \item You don't need to alter any parameters from the SAC run commands. The correct implementation should work with the provided default parameters.
+
+\end{enumerate}
+
+
+\end{document}
