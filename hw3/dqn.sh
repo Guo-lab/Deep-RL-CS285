@@ -36,12 +36,8 @@ case $EXPERIMENT in
             python cs285/scripts/run_hw3_dqn.py \
                 -cfg experiments/dqn/lunarlander.yaml \
                 --seed "$seed" \
-                --target_update_period 500 \
                 --clip_grad_norm 10.0 \
-                --learning_rate 0.001 \
-                --batch_size 256 \
-                --log_interval 5000 \
-                --eval_interval 5000
+                --batch_size 128
             sleep 2
         done
         ;;
@@ -53,12 +49,8 @@ case $EXPERIMENT in
             python cs285/scripts/run_hw3_dqn.py \
                 -cfg experiments/dqn/lunarlander_doubleq.yaml \
                 --seed "$seed" \
-                --target_update_period 500 \
                 --clip_grad_norm 10.0 \
-                --learning_rate 0.001 \
-                --batch_size 256 \
-                --log_interval 5000 \
-                --eval_interval 5000
+                --batch_size 128
             sleep 2
         done
         ;;

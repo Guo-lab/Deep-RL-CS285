@@ -290,17 +290,17 @@ class SoftActorCritic(nn.Module):
         # (11) TODO(student): Generate an action distribution
         action_distribution: torch.distributions.Distribution = self.actor(obs)
 
+        # (11) TODO(student): draw num_actor_samples samples from the action distribution
+        # for each batch element - NOTE: Don't use no_grad here as we need gradients through log_prob
+        action = action_distribution.sample((self.num_actor_samples,))
+
+        assert action.shape == (
+            self.num_actor_samples,
+            batch_size,
+            self.action_dim,
+        ), action.shape
+
         with torch.no_grad():
-            # (11) TODO(student): draw num_actor_samples samples from the action distribution
-            # for each batch element
-            action = action_distribution.sample((self.num_actor_samples,))
-
-            assert action.shape == (
-                self.num_actor_samples,
-                batch_size,
-                self.action_dim,
-            ), action.shape
-
             # (11) TODO(student): Compute Q-values for the current state-action pair
             """
             Evaluate the critic network on each sampled (s,a) pair.
@@ -336,11 +336,22 @@ class SoftActorCritic(nn.Module):
 
             # Our best guess of the Q-values is the mean of the ensemble
             q_values = torch.mean(q_values, axis=0)
-            advantage = q_values
+
+            # Normalize Q-values for REINFORCE to reduce variance and gradient scale issues
+            # This is especially important when Q-values are large
+            if self.num_actor_samples > 1:
+                # For multiple samples, subtract sample mean and normalize by sample std
+                q_mean = q_values.mean(dim=0, keepdim=True)
+                advantage = q_values - q_mean
+            else:
+                # For single sample, just center the Q-values around their batch mean
+                q_mean = q_values.mean()
+                advantage = q_values - q_mean
 
         # Do REINFORCE: calculate log-probs and use the Q-values
         # (11) TODO(student)
         log_probs = action_distribution.log_prob(action)
+
         """
         Lets maximize the Q values
         $$\nabla_\theta \mathbb{E}[Q] = \mathbb{E}[\nabla_\theta \log \pi_\theta(a|s) \cdot Q(s,a)]$$

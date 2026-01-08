@@ -2,4 +2,5 @@
 
 /hw2/data
 
-
+*.pyc
+__pycache__/
