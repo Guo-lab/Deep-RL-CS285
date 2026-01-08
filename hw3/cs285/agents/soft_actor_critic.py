@@ -339,14 +339,9 @@ class SoftActorCritic(nn.Module):
 
             # Normalize Q-values for REINFORCE to reduce variance and gradient scale issues
             # This is especially important when Q-values are large
-            if self.num_actor_samples > 1:
-                # For multiple samples, subtract sample mean and normalize by sample std
-                q_mean = q_values.mean(dim=0, keepdim=True)
-                advantage = q_values - q_mean
-            else:
-                # For single sample, just center the Q-values around their batch mean
-                q_mean = q_values.mean()
-                advantage = q_values - q_mean
+            # Center Q-values around their overall mean to reduce gradient scale issues
+            q_mean = q_values.mean()
+            advantage = q_values - q_mean
 
         # Do REINFORCE: calculate log-probs and use the Q-values
         # (11) TODO(student)
