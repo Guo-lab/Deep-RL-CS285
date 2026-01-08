@@ -3,7 +3,9 @@
     "allow": [
       "Bash(find:*)",
       "Bash(tree:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(mv:*)",
+      "Bash(chmod:*)"
     ]
   }
 }

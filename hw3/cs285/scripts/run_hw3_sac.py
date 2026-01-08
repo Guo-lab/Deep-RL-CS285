@@ -19,8 +19,6 @@ from scripting_utils import make_config, make_logger
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
-warnings.filterwarnings("ignore", category=FutureWarning)
-warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
 
 
 def str2bool(v):

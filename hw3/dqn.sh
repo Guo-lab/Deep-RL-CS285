@@ -36,7 +36,12 @@ case $EXPERIMENT in
             python cs285/scripts/run_hw3_dqn.py \
                 -cfg experiments/dqn/lunarlander.yaml \
                 --seed "$seed" \
-                --clip_grad_norm 10.0
+                --target_update_period 500 \
+                --clip_grad_norm 10.0 \
+                --learning_rate 0.001 \
+                --batch_size 256 \
+                --log_interval 5000 \
+                --eval_interval 5000
             sleep 2
         done
         ;;
@@ -48,7 +53,12 @@ case $EXPERIMENT in
             python cs285/scripts/run_hw3_dqn.py \
                 -cfg experiments/dqn/lunarlander_doubleq.yaml \
                 --seed "$seed" \
-                --clip_grad_norm 10.0
+                --target_update_period 500 \
+                --clip_grad_norm 10.0 \
+                --learning_rate 0.001 \
+                --batch_size 256 \
+                --log_interval 5000 \
+                --eval_interval 5000
             sleep 2
         done
         ;;
@@ -75,7 +85,7 @@ case $EXPERIMENT in
 
     *)
         echo "Error: Invalid experiment number '$EXPERIMENT'"
-        echo "Available experiments: 1, 2, 3, 4"
+        echo "Available experiments: 1, 2, 3, 3fast, 4"
         exit 1
         ;;
 esac

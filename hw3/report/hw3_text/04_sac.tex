@@ -8,10 +8,10 @@ problem.
 
 Actor-critic methods get around this by learning two networks: a $Q$-function, like DQN, and an explicit policy $\pi$ that is trained to maximize $\mathbb{E}_{a \sim \pi(a|s)} Q(s, a)$.
 
-All parts in this section are run with the following command:
-\begin{lstlisting}[language=bash,breaklines=true]
-  python cs285/scripts/run_hw3_sac.py -cfg experiments/sac/<CONFIG>.yaml
-\end{lstlisting}
+% All parts in this section are run with the following command:
+% \begin{lstlisting}[language=bash,breaklines=true]
+%   python cs285/scripts/run_hw3_sac.py -cfg experiments/sac/<CONFIG>.yaml
+% \end{lstlisting}
 
 \subsection{Implementation}
 First, you'll need to take a look at the following files:
@@ -26,12 +26,12 @@ You may also find the following files useful:
     \item \verb|experiments/sac/*.yaml| - configuration files for the experiments.
 \end{itemize}
 
-You'll primarily be implementing your code in \verb|cs285/agents/soft_actor_critic.py|.
+% You'll primarily be implementing your code in \verb|cs285/agents/soft_actor_critic.py|.
 
-\textbf{Before implementing SAC:}
-\begin{itemize}
-    \item Fill in all of the \verb|TODO|s in \verb|cs285/scripts/run_hw3_sac.py|. This should look pretty similar to your DQN run script, as both are off-policy methods!
-\end{itemize}
+% \textbf{Before implementing SAC:}
+% \begin{itemize}
+%     \item Fill in all of the \verb|TODO|s in \verb|cs285/scripts/run_hw3_sac.py|. This should look pretty similar to your DQN run script, as both are off-policy methods!
+% \end{itemize}
 
 \subsubsection{Bootstrapping}
 As in DQN, we train our critic by ``bootstrapping'' from a target critic. Using the tuple $(s_t, a_t, r_t, s_{t+1}, d_{t})$ (where $d_t$ is the flag for whether the trajectory terminates after this transition), we write:
@@ -61,9 +61,9 @@ In practice, we stabilize learning by using a separate \textit{target network} $
 \begin{center}
     \begin{minipage}{\linewidth}
         \centering
-        \includegraphics[width=0.3\linewidth]{imgs/211_q_values.png}
+        \includegraphics[width=0.25\linewidth]{imgs/211_q_values.png}
     \end{minipage}
-    \vspace{0.1cm}
+    % \vspace{0.1cm}
     {\footnotesize Stabilized Q-values.}
 \end{center}
 
@@ -111,7 +111,7 @@ Note that maximizing entropy $\mathcal{H}(\pi_\theta) = -\mathbb{E}[\log \pi_\th
                   \includegraphics[width=\linewidth]{imgs/212_critic_loss.png}
               \end{minipage}
               
-              \vspace{1em}
+            %   \vspace{1em}
 
               {\footnotesize The entropy $\mathcal{H}(\pi) = \mathbb{E}_{a \sim \pi}[-\log \pi(a|s)]$ = $\log 2$ around 0.69}
           \end{center}
@@ -150,6 +150,15 @@ Note that the actions $a$ are sampled from $\pi_\theta$, and we do \textbf{not} 
     \item Train another agent with \verb|halfcheetah_reinforce_10.yaml|. This configuration takes many samples from the actor for computing the REINFORCE gradient (we'll call this REINFORCE-10, and the single-sample version REINFORCE-1). Plot the results (evaluation return over time) on the same axes as the single-sample REINFORCE. Compare and explain your results.
 \end{itemize}
 
+\begin{center}
+    \begin{minipage}{\linewidth}
+        \centering
+        \includegraphics[width=0.42\linewidth]{imgs/213_halfcheetah_reinforce_comparison.png}
+    \end{minipage}
+    \vspace{0.1cm}
+    {\footnotesize HalfCheetah-v4 training comparison: REINFORCE-1 vs REINFORCE-10.}
+\end{center}
+
 \subsubsection{Actor with REPARAMETRIZE}
 REINFORCE works quite well with many samples, but particularly in high-dimensional action spaces, it starts to require a lot of samples to give low variance. We can improve this by using the reparametrized gradient. Parametrize $\pi_\theta$ as $\mu_\theta(s) + \sigma_\theta(s)\epsilon$, where $\epsilon$ is normally distributed. Then we can write:
 \[\nabla_\theta\mathbb{E}_{s \sim \mathcal{D}, a \sim \pi_\theta(a|s)}\left[Q(s, a)\right] = \nabla_\theta\mathbb{E}_{s \sim \mathcal{D}, \epsilon \sim \mathcal{N}}\left[Q(s, \mu_\theta(s) + \sigma_\theta(s)\epsilon))\right] = \mathbb{E}_{s \sim \mathcal{D}, \epsilon \sim \mathcal{N}}\left[\nabla_\theta Q(s, \mu_\theta(s) + \sigma_\theta(s)\epsilon))\right]\]
@@ -167,11 +176,47 @@ This gradient estimator often gives a much lower variance, so it can be used wit
     \item Make sure you can solve \verb|InvertedPendulum-v4| (use \verb|sanity_invertedpendulum_reparametrize.yaml|) and achieve similar reward to the REINFORCE case.
 \end{itemize}
 
+\begin{center}
+    \begin{minipage}{\linewidth}
+        \centering
+        \includegraphics[width=0.6\linewidth]{imgs/214_invertedpendulum_reparametrized.png}
+    \end{minipage}
+    \vspace{0.1cm}
+    {\footnotesize Testing InvertedPendulum with REPARAMETRIZE.}
+\end{center}
+
+
 \textbf{Deliverables}:
 \begin{itemize}
     \item Train (once again) on \verb|HalfCheetah-v4| with \verb|halfcheetah_reparametrize.yaml|. Plot results for all three gradient estimators (REINFORCE-1, REINFORCE-10 samples, and REPARAMETRIZE) on the same set of axes, with number of environment steps on the $x$-axis and evaluation return on the $y$-axis.
     \item Train an agent for the \verb|Humanoid-v4| environment with \verb|humanoid_sac.yaml| and plot results.
 \end{itemize}
+
+\begin{center}
+    \begin{minipage}{\linewidth}
+        \centering
+        \includegraphics[width=0.6\linewidth]{imgs/214_halfcheetah_all_methods.png}
+    \end{minipage}
+    \vspace{0.1cm}
+    {\footnotesize HalfCheetah-v4: Comparison of REINFORCE-1, REINFORCE-10, and REPARAMETRIZE gradient estimators.}
+\end{center}
+
+The results demonstrate clear differences in sample efficiency and stability across gradient estimators. REPARAMETRIZE (pink) achieves the most stable convergence and highest final performance ($\sim$4200), with low variance throughout training. 
+
+REINFORCE-10 (cyan) reaches similar asymptotic performance but requires more environment steps to converge. REINFORCE-1 exhibits significantly higher variance and lower sample efficiency, with (navy) showing extreme instability. \\
+
+This confirms that the reparametrization trick provides substantially lower variance gradients, enabling reliable learning with single-sample estimates, while REINFORCE requires multiple action samples to achieve comparable performance.
+
+\begin{center}
+    \begin{minipage}{\linewidth}
+        \centering
+        \includegraphics[width=0.6\linewidth]{imgs/humanoid_reparametrize.png}
+    \end{minipage}
+    \vspace{0.1cm}
+    {\footnotesize Humanoid-v4: Two trials showing reparametrize performance.}
+\end{center}
+
+\newpage
 
 \subsubsection{Stabilizing Target Values}
 As in DQN, the target $Q$ with a single critic exhibits \textit{overestimation bias}! There are a few commonly-used strategies to combat this:

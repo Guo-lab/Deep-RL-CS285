@@ -18,9 +18,7 @@ class SoftActorCritic(nn.Module):
             [torch.optim.Optimizer], torch.optim.lr_scheduler._LRScheduler
         ],
         make_critic: Callable[[Tuple[int, ...], int], nn.Module],
-        make_critic_optimizer: Callable[
-            [torch.nn.ParameterList], torch.optim.Optimizer
-        ],
+        make_critic_optimizer: Callable[[torch.nn.ParameterList], torch.optim.Optimizer],
         make_critic_schedule: Callable[
             [torch.optim.Optimizer], torch.optim.lr_scheduler._LRScheduler
         ],
@@ -63,19 +61,13 @@ class SoftActorCritic(nn.Module):
         self.actor_lr_scheduler = make_actor_schedule(self.actor_optimizer)
 
         self.critics = nn.ModuleList(
-            [
-                make_critic(observation_shape, action_dim)
-                for _ in range(num_critic_networks)
-            ]
+            [make_critic(observation_shape, action_dim) for _ in range(num_critic_networks)]
         )
 
         self.critic_optimizer = make_critic_optimizer(self.critics.parameters())
         self.critic_lr_scheduler = make_critic_schedule(self.critic_optimizer)
         self.target_critics = nn.ModuleList(
-            [
-                make_critic(observation_shape, action_dim)
-                for _ in range(num_critic_networks)
-            ]
+            [make_critic(observation_shape, action_dim) for _ in range(num_critic_networks)]
         )
         self.update_target_critic()
 
@@ -104,9 +96,7 @@ class SoftActorCritic(nn.Module):
         with torch.no_grad():
             observation = ptu.from_numpy(observation)[None]
 
-            action_distribution: torch.distributions.Distribution = self.actor(
-                observation
-            )
+            action_distribution: torch.distributions.Distribution = self.actor(observation)
             action: torch.Tensor = action_distribution.sample()
 
             assert action.shape == (1, self.action_dim), action.shape
@@ -122,9 +112,7 @@ class SoftActorCritic(nn.Module):
         """
         Compute the (ensembled) target Q-values for the given state-action pair.
         """
-        return torch.stack(
-            [critic(obs, action) for critic in self.target_critics], dim=0
-        )
+        return torch.stack([critic(obs, action) for critic in self.target_critics], dim=0)
 
     def q_backup_strategy(self, next_qs: torch.Tensor) -> torch.Tensor:
         """
@@ -150,15 +138,42 @@ class SoftActorCritic(nn.Module):
 
         assert num_critic_networks == self.num_critic_networks
 
-        # (9) TODO(student): Implement the different backup strategies.
+        # (9) (14) TODO(student): Implement the different backup strategies.
         if self.target_critic_backup_type == "doubleq":
-            raise NotImplementedError
+            """
+            Given the next_qs with shape  (num_critics, batch_size),
+            Q-values FROM different target critics.
+
+            Then the doubleq would use the rotation pattern.
+            """
+            next_qs = torch.roll(next_qs, shifts=-1, dims=0)
+
         elif self.target_critic_backup_type == "min":
-            raise NotImplementedError
+            """
+            y_A = y_B = r + gamma min(Q_φ'_A(s', a'), Q_φ'_B(s', a'))
+            Find the minimum Q-value across all critics.
+            """
+            next_qs = torch.min(next_qs, dim=0).values
+
+        elif self.target_critic_backup_type == "redq":
+            # For each batch element, randomly sample 2 critics
+            """
+            Ensembled clipped double-Q:
+            learn many critics (10 is common) and keep a target network for each.
+            To compute target values, first run all the critics and sample two Q-values
+            for each sample.
+            Then, take the minimum (as in clipped double-Q).
+            If you want to learn more about this, you can check out
+            ``Randomized Ensembled Double-Q'': https://arxiv.org/abs/2101.05982}
+            """
+            random_sample = torch.randperm(num_critic_networks)[:2]
+            next_qs = torch.min(next_qs[random_sample], dim=0).values
+
         elif self.target_critic_backup_type == "mean":
             next_qs = next_qs.mean(dim=0, keepdim=True).expand(
                 (self.num_critic_networks, batch_size)
             )
+
         else:
             # Default, we don't need to do anything.
             pass
@@ -166,16 +181,13 @@ class SoftActorCritic(nn.Module):
         # If our backup strategy removed a dimension, add it back in explicitly
         # (assume the target for each critic will be the same)
         if next_qs.shape == (batch_size,):
-            next_qs = (
-                next_qs[None]
-                .expand((self.num_critic_networks, batch_size))
-                .contiguous()
-            )
+            next_qs = next_qs[None].expand((self.num_critic_networks, batch_size)).contiguous()
 
         assert next_qs.shape == (
             self.num_critic_networks,
             batch_size,
         ), next_qs.shape
+
         return next_qs
 
     def update_critic(
@@ -196,9 +208,7 @@ class SoftActorCritic(nn.Module):
         with torch.no_grad():
             # (7) TODO(student)
             # Sample from the actor
-            next_action_distribution: torch.distributions.Distribution = self.actor(
-                next_obs
-            )
+            next_action_distribution: torch.distributions.Distribution = self.actor(next_obs)
             assert isinstance(
                 next_action_distribution,
                 torch.distributions.Distribution,
@@ -224,6 +234,8 @@ class SoftActorCritic(nn.Module):
                 next_action_entropy = self.entropy(next_action_distribution)
                 # As we want to maximize the entropy
                 # $\mathbb{E}_{a \sim \pi}[-\log \pi(a|s)]$
+                # The target Q-value includes entropy:
+                # y = r + γ(1-done) * [Q_target(s', a') + β * H(π(·|s'))]
                 next_qs -= self.temperature * next_action_entropy
 
             # (8) TODO Compute the target Q-value
@@ -290,17 +302,17 @@ class SoftActorCritic(nn.Module):
         # (11) TODO(student): Generate an action distribution
         action_distribution: torch.distributions.Distribution = self.actor(obs)
 
-        # (11) TODO(student): draw num_actor_samples samples from the action distribution
-        # for each batch element - NOTE: Don't use no_grad here as we need gradients through log_prob
-        action = action_distribution.sample((self.num_actor_samples,))
-
-        assert action.shape == (
-            self.num_actor_samples,
-            batch_size,
-            self.action_dim,
-        ), action.shape
-
         with torch.no_grad():
+            # (11) TODO(student): draw num_actor_samples samples from the action distribution
+            # for each batch element
+            action = action_distribution.sample((self.num_actor_samples,))
+
+            assert action.shape == (
+                self.num_actor_samples,
+                batch_size,
+                self.action_dim,
+            ), action.shape
+
             # (11) TODO(student): Compute Q-values for the current state-action pair
             """
             Evaluate the critic network on each sampled (s,a) pair.
@@ -319,9 +331,7 @@ class SoftActorCritic(nn.Module):
                 align_dim = self.num_actor_samples * batch_size
                 obs_flat = obs_expanded.reshape(align_dim, obs.shape[1])
                 action_flat = action.reshape(align_dim, action.shape[2])
-                q = critic(obs_flat, action_flat).view(
-                    self.num_actor_samples, batch_size
-                )
+                q = critic(obs_flat, action_flat).view(self.num_actor_samples, batch_size)
 
                 assert q.shape == (self.num_actor_samples, batch_size), q.shape
                 q_values_list.append(q)
@@ -337,16 +347,16 @@ class SoftActorCritic(nn.Module):
             # Our best guess of the Q-values is the mean of the ensemble
             q_values = torch.mean(q_values, axis=0)
 
+            # (13) For REINFORCE1:
             # Normalize Q-values for REINFORCE to reduce variance and gradient scale issues
             # This is especially important when Q-values are large
-            # Center Q-values around their overall mean to reduce gradient scale issues
+            # Center the Q-values around their batch mean
             q_mean = q_values.mean()
             advantage = q_values - q_mean
 
         # Do REINFORCE: calculate log-probs and use the Q-values
         # (11) TODO(student)
         log_probs = action_distribution.log_prob(action)
-
         """
         Lets maximize the Q values
         $$\nabla_\theta \mathbb{E}[Q] = \mathbb{E}[\nabla_\theta \log \pi_\theta(a|s) \cdot Q(s,a)]$$
@@ -369,13 +379,30 @@ class SoftActorCritic(nn.Module):
 
         # (12) TODO(student): Sample actions
         # Note: Think about whether to use .rsample() or .sample() here...
-        action = ...
+        action = action_distribution.rsample()
 
         # (12) TODO(student): Compute Q-values for the sampled state-action pair
-        q_values = ...
+        q_values_list = []
+        for critic in self.critics:
+            q_value = critic(obs, action)
+            q_values_list.append(q_value)
+
+        q_values = torch.stack(q_values_list)
+
+        # Actor params → μ(s), σ(s)
+        #              → action = μ + σ*ε → Q(s, action)
+        #              → loss
 
         # (12) TODO(student): Compute the actor loss
-        loss = ...
+        """
+        With reparametrization, we directly backprop through Q-values
+        When we compute Q(s, action) and backprop through it, the gradients flow 
+        all the way back to the actor's parameters through the action itself.
+        We want to maximize Q, so we minimize -Q
+        Take the mean over all critics
+        """
+        q_values = q_values.mean(dim=0)
+        loss = -q_values.mean()
 
         return loss, torch.mean(self.entropy(action_distribution))
 
@@ -413,12 +440,8 @@ class SoftActorCritic(nn.Module):
 
     def soft_update_target_critic(self, tau):
         for target_critic, critic in zip(self.target_critics, self.critics):
-            for target_param, param in zip(
-                target_critic.parameters(), critic.parameters()
-            ):
-                target_param.data.copy_(
-                    target_param.data * (1.0 - tau) + param.data * tau
-                )
+            for target_param, param in zip(target_critic.parameters(), critic.parameters()):
+                target_param.data.copy_(target_param.data * (1.0 - tau) + param.data * tau)
 
     def update(
         self,
@@ -449,10 +472,7 @@ class SoftActorCritic(nn.Module):
         #  - step
         #  - self.target_update_period (None when using soft updates)
         #  - self.soft_target_update_rate (None when using hard updates)
-        if (
-            self.target_update_period is not None
-            and step % self.target_update_period == 0
-        ):
+        if self.target_update_period is not None and step % self.target_update_period == 0:
             # Hard target updates
             self.update_target_critic()
 
@@ -461,9 +481,7 @@ class SoftActorCritic(nn.Module):
             self.soft_update_target_critic(self.soft_target_update_rate)
 
         # Average the critic info over all of the steps
-        critic_info = {
-            k: np.mean([info[k] for info in critic_infos]) for k in critic_infos[0]
-        }
+        critic_info = {k: np.mean([info[k] for info in critic_infos]) for k in critic_infos[0]}
 
         # Deal with LR scheduling
         self.actor_lr_scheduler.step()
