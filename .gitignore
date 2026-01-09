@@ -2,5 +2,7 @@
 
 /hw2/data
 
+/hw3/data/humanoid
+
 *.pyc
 __pycache__/
