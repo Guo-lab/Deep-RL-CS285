@@ -1,0 +1,44 @@
+\section{MBRL Problem 2}
+
+\subsection{What you will implement}
+
+Action selection using your learned dynamics model and a given reward function.
+
+\subsection{What code files to fill in}
+
+\begin{itemize}
+    \item \verb|cs285/agents/model_based_agent.py|: the rest of the file, except for the CEM strategy in \verb|get_action|.
+\end{itemize}
+
+\subsection{What commands to run}
+ \begin{lstlisting}[language=bash,breaklines=true]
+  python cs285/scripts/run_hw4.py -cfg experiments/mpc/obstacles_1_iter.yaml
+\end{lstlisting}
+
+Recall the overall flow of our training loop. We first collect data with our policy (which starts as random), we
+train our model on that collected data, we evaluating the resulting MPC policy (which now uses the trained
+model), and repeat. To verify that your MPC is indeed doing reasonable action selection, run one iteration of
+this process using the command above. This will evaluate your MPC policy, but not use it to collect data for
+future iterations. Look at \verb|eval_return|, which should be greater than -70 after one iteration.
+
+\subsection{What to submit:}
+Submit this run as part of your run logs, and report your \verb|eval_return|.
+
+
+\begin{lstlisting}[language=bash,breaklines=true]
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw4/cs285/scripts/../../data/obstacles-cs285-v0_obstacles_single_l2_h250_mpcrandom_horizon10_actionseq1000_09-01-2026_03-37-12
+########################
+Using GPU id 0
+
+
+********** Iteration 0 ************
+Collecting data...
+Training agent...
+100%|███████████████████████████████████████████████████████████████████████| 20/20 [00:00<00:00, 47.44it/s]
+Evaluating 20 rollouts...
+Average eval return: -32.893217120463
+\end{lstlisting}
+
+
+\newpage

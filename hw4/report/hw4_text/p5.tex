@@ -1,0 +1,39 @@
+\section{MBRL Problem 5}
+
+\subsection{What you will implement}
+
+You will compare the performance of your MBRL algorithm with action selecting performed by random-shooting (what you have done up to this point) and CEM.
+
+Because CEM can be much slower than random-shooting, we will only run MBRL for 5 iterations for this
+problem. We will try two hyperparameter settings for CEM and compare their performance to random-shooting.
+
+\subsection{What code files to fill in}
+
+\begin{itemize}
+    \item \verb|cs285/agents/model_based_agent.py|: the CEM action selection strategy.
+\end{itemize}
+
+\subsection{What commands to run}
+ \begin{lstlisting}[language=bash,breaklines=true]
+  python cs285/scripts/run_hw4.py -cfg experiments/mpc/halfcheetah_cem.yaml
+\end{lstlisting}
+
+You should expect rewards around 800 or higher when using CEM on the cheetah env. Try a \verb|cem_iterations|
+value of both 2 and 4, and compare results.
+
+\subsection{What to submit:}
+
+\begin{enumerate}
+    \item Submit these runs as part of your run logs.
+    \item Include a plot comparing random shooting (from Problem 3) with CEM, as well as captions that describe
+how CEM affects results for different numbers of sampling iterations (2 vs. 4).
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{hw4_text/figures/p5/cem.png}
+    \caption{Comparison of CEM vs Random Shooting on HalfCheetah: The plot shows evaluation returns across 5 MBRL iterations. CEM with 4 iterations (pink) achieves the best performance, reaching approximately 900 reward. CEM with 3 iterations (orange) reaches around 650-700, while CEM with 2 iterations (purple) performs similar or better than random shooting baseline (green) at around 100-400. The results demonstrate that CEM significantly outperforms random shooting when using sufficient iterations (4), with performance scaling with the number of CEM iterations used for action selection.}
+    \label{fig:cem_comparison}
+\end{figure}
+
+\newpage

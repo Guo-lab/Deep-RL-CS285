@@ -263,7 +263,7 @@ Interestingly, REDQ (green) achieves even lower Q-values than clipped double-Q b
     \item Pick the best configuration (single-$Q$/double-$Q$/clipped double-$Q$, or REDQ if you implement it) and run it on \verb|Humanoid-v4| using \verb|humanoid.yaml| (edit the config to use the best option). You can truncate it after 500K environment steps. If you got results from the humanoid environment in the last homework, plot them together with environment steps on the $x$-axis and evaluation return on the $y$-axis. Otherwise, we will provide a humanoid log file that you can use for comparison. How do the off-policy and on-policy algorithms compare in terms of sample efficiency? \textit{Note: if you'd like to run training to completion (5M steps), you should get a proper, walking humanoid! You can run with videos enabled by using \texttt{-nvid 1}. If you run with videos, you can strip videos from the logs for submission with \href{https://gist.github.com/kylestach/e9964f5f34ee74367547dec83eaf5fae}{this script}.}
     
 
-    \begin{center}
+\begin{center}
     \begin{minipage}{\linewidth}
         \centering
         \includegraphics[width=0.6\linewidth]{imgs/sac_vs_pg.png}
@@ -272,7 +272,18 @@ Interestingly, REDQ (green) achieves even lower Q-values than clipped double-Q b
     {\footnotesize Humanoid-v4: Sample efficiency comparison between off-policy (SAC) and on-policy algorithms.}
 \end{center}
 
+\begin{center}
+    \begin{minipage}{\linewidth}
+        \centering
+        \includegraphics[width=0.6\linewidth]{imgs/sac_vs_pg_2.png}
+    \end{minipage}
+    \vspace{0.1cm}
+    {\footnotesize Humanoid-v4: Add Another second SAC trial.}
+\end{center}
+
 Off-policy SAC demonstrates significantly better sample efficiency compared to on-policy methods, achieving meaningful learning progress within 500K environment steps. The off-policy approach benefits from replay buffer utilization, allowing each experience to be reused multiple times for training, whereas on-policy methods must discard data after each update. This advantage is particularly pronounced in complex environments like Humanoid-v4, where sample collection is expensive and off-policy learning can extract more value from limited interactions.
+
+SAC reached higher return than PG.
 
 \end{itemize}
 

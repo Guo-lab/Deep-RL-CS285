@@ -1,0 +1,58 @@
+\section{MBRL Problem 3}
+
+\subsection{What you will implement}
+
+MBRL algorithm with on-policy data collection and iterative model training.
+
+\subsection{What code files to fill in}
+
+None. You should already have done everything that you need, because \verb|run_hw4.py| already aggregates
+your collected data into a replay buffer. Thus, iterative training means to just train on our growing replay
+buffer while collecting new data at each iteration using the most newly trained model.
+
+\subsection{What commands to run}
+ \begin{lstlisting}[language=bash,breaklines=true]
+  python cs285/scripts/run_hw4.py -cfg experiments/mpc/obstacles_multi_iter.yaml
+\end{lstlisting}
+
+ \begin{lstlisting}[language=bash,breaklines=true]
+  python cs285/scripts/run_hw4.py -cfg experiments/mpc/reacher_multi_iter.yaml
+\end{lstlisting}
+
+ \begin{lstlisting}[language=bash,breaklines=true]
+  python cs285/scripts/run_hw4.py -cfg experiments/mpc/halfcheetah_multi_iter.yaml
+\end{lstlisting}
+
+You should expect rewards of around -25 to -20 for the obstacles env, rewards of around -300 to -250 for the
+reacher env, and rewards of around 250-350 for the cheetah env.
+
+\subsection{What to submit:}
+Submit these runs as part of your run logs, and include the return plots in your pdf.
+
+\subsection{Results}
+\vspace{-0.5em}
+
+\begin{figure}[htb]
+\centering
+\begin{minipage}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p3/obstacles_return.png}
+    \subcaption{Obstacles}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p3/reacher_return.png}
+    \subcaption{Reacher}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p3/halfcheetah_return.png}
+    \subcaption{HalfCheetah}
+\end{minipage}
+\caption{Multi-iteration MBRL performance across three environments. Returns improve over iterations as the model is retrained with on-policy data.}
+\vspace{-1em}
+\end{figure}
+
+\newpage

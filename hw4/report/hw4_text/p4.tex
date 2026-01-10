@@ -1,0 +1,69 @@
+\section{MBRL Problem 4}
+
+\subsection{What you will implement}
+
+You will compare the performance of your MBRL algorithm as a function of three hyperparameters: the
+number of models in your ensemble, the number of random action sequences considered during each action
+selection, and the MPC planning horizon.
+
+\subsection{What code files to fill in} None.
+
+\subsection{What commands to run}
+ \begin{lstlisting}[language=bash,breaklines=true]
+  python cs285/scripts/run_hw4.py -cfg experiments/mpc/reacher_ablation.yaml
+\end{lstlisting}
+
+Modify (or make copies of) the YAML file to ablate each of the hyperparameters. For each hyperparameter,
+do at least 1 run with it increased and 1 with it decreased from the default (so 7 runs total). Make sure to
+keep the other hyperparameters the same when studying the effect of one of them.
+
+\subsection{What to submit:}
+
+\begin{enumerate}[itemsep=0pt, topsep=0pt, parsep=0pt, partopsep=0pt]
+    \item Submit these runs as part of your run logs.
+    \item Include the following plots (as well as captions that describe your observed trends) of the following:
+    \begin{itemize}[itemsep=0pt, topsep=0pt, parsep=0pt, partopsep=0pt]
+        \item effect of ensemble size
+        \item effect of the number of candidate action sequences
+        \item effect of planning horizon
+    \end{itemize}
+\end{enumerate}
+
+% Be sure to include titles and legends on all of your plots.
+
+\vspace{-0.5em}
+
+\begin{figure}[htb]
+\centering
+\begin{minipage}{0.31\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p4/ablation_ensemble.png}
+    \subcaption{\footnotesize Effect of ensemble size}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.315\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p4/ablation_action_seq.png}
+    \subcaption{\footnotesize Effect of the number of candidate action sequences}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.31\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p4/ablation_horizon.png}
+    \subcaption{\footnotesize Effect of planning horizon}
+\end{minipage}%
+\vspace{-0.5em}
+\caption{\centering \footnotesize
+    Ablation Study: i) Action sequence length affects optimization difficulty. Long or short action sequences seem both lead to higher initial return. ii) Ensemble size affects model uncertainty \& conservatism. Large ensemble size leads to lower initial return, but the final results would not be superior. iii) Planning horizon affects model bias accumulation. Low horizon seems lead to lower initial evaluation return but higher final return and faster convergence.}
+\vspace{-1em}
+\end{figure}
+\vspace{1em}
+
+\begin{itemize}
+    \item Short sequences reduce optimization difficulty and model-error accumulation, leading to stable early performance. Long sequences increase exploration and occasionally discover high-reward trajectories, but suffer from higher variance and reduced reliability later in training.
+    \item Larger ensembles reduce initial performance due to increased conservatism from model disagreement. Early uncertainty biases planning toward safer actions. As models improve, this effect weakens, but larger ensembles do not improve final performance, indicating diminishing returns once uncertainty is sufficiently mitigated.
+    \item Short horizons produce lower initial returns due to limited foresight, but enable faster convergence and higher final performance. Reduced rollout error and more frequent replanning improve optimization stability, highlighting a trade-off between early performance and long-term learning efficiency.
+\end{itemize}
+
+
+\newpage

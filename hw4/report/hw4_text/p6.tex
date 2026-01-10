@@ -1,0 +1,76 @@
+\section{MBRL Problem 6}
+
+\subsection{What you will implement}
+
+In this homework you will also be implementing a variant of MBPO. Another way of leveraging the learned
+model is through generating additional samples to train the policy and value functions. Since RL often
+requires many environment interaction samples, which can be costly, we can use our learned model to generate
+additional samples to improve sample complexity. In MBPO, we build on your SAC implementation from HW3
+and use the learned model you implemented in the earlier questions for generating additional samples to train
+our SAC agent. We will try three settings:
+
+\begin{enumerate}
+    \item Model-free SAC baseline: no additional rollouts from the learned model.
+    \item Dyna (technically ``dyna-style'' - the original Dyna algorithm is a little different): add single-step rollouts
+from the model to the replay buffer and incorporate additional gradient steps per real world step.
+    \item MBPO: add in 10-step rollouts from the model to the replay buffer and incorporate additional gradient
+steps per real world step.
+\end{enumerate}
+
+\subsection{What code files to fill in}
+
+\begin{itemize}[itemsep=0pt, topsep=0pt, parsep=0pt, partopsep=0pt]
+    \item \verb|cs285/scripts/run_hw4.py|: the \verb|collect_mbpo_rollout| function at the top of the file.
+\end{itemize}
+
+\subsection{What commands to run}
+ \begin{lstlisting}[language=bash,breaklines=true]
+  python cs285/scripts/run_hw4.py -cfg experiments/mpc/halfcheetah_mbpo.yaml --sac_config_file experiments/sac/halfcheetah_clipq.yaml
+\end{lstlisting}
+
+Edit \verb|experiments/sac/halfcheetah_clipq.yaml| to change the MBPO rollout length. The model-free
+SAC baseline corresponds to a rollout length of 0, The Dyna-like algorithm corresponds to a rollout length of
+1, and full MBPO corresponds to a rollout length of 10.
+
+You should be able to reach returns around 700 or higher with full MBPO with a rollout length of 10.
+
+\subsection{What to submit:}
+
+\begin{enumerate}[itemsep=0pt, topsep=0pt, parsep=0pt, partopsep=0pt]
+    \item Submit these 3 runs as part of your run logs.
+    \item Include a plot to show a comparison between the 3 runs, and explain any trends you see.
+\end{enumerate}
+
+\begin{figure}[htb]
+\centering
+\begin{minipage}{0.46\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p6/dyna_loss.png}
+    \subcaption{\footnotesize The plot shows dynamics loss over training iterations.}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.46\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p6/eval_return.png}
+    \subcaption{\footnotesize The plot shows evaluation returns over training iterations.}
+\end{minipage}%
+\caption{\centering \footnotesize
+MBPO Training Progress: Comparison of model-free SAC baseline, Dyna-style (1-step), and full MBPO (10-step) on HalfCheetah environment. Large rollout length helps.}
+\vspace{-1em}
+\end{figure}
+
+% \textbf{Analysis:}
+
+% The results demonstrate the effectiveness of model-based data augmentation in MBPO:
+
+% \begin{itemize}
+%     \item \textbf{Model-free SAC (rollout length = 0)}: Serves as the baseline, learning purely from real environment interactions without synthetic data from the dynamics model.
+
+%     \item \textbf{Dyna-style (rollout length = 1)}: Augments training with single-step predictions from the learned model. This provides additional training data while minimizing error accumulation from model inaccuracies.
+
+%     \item \textbf{Full MBPO (rollout length = 10)}: Generates 10-step synthetic rollouts, significantly increasing the amount of training data available to SAC. This enables more gradient updates per real environment step, improving sample efficiency.
+% \end{itemize}
+
+% The key insight of MBPO is that the dynamics model acts as an ``imagination'' system, allowing the policy to practice in simulated scenarios without costly real environment interactions. By separating the dynamics model training (using only real data) from policy training (using both real and synthetic data), MBPO achieves improved sample efficiency while maintaining stable learning.
+
+\newpage

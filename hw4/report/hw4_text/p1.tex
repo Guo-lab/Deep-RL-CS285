@@ -1,0 +1,100 @@
+\section{MBRL Problem 1}
+% \vspace{-1em}
+
+\subsection{What you will implement}
+% \vspace{-0.5em}
+Collect a large dataset by executing random actions. Train a neural network dynamics model on this fixed
+dataset. The implementation that you will do here will be for training the dynamics model.
+\vspace{-0.5em}
+
+\subsection{What code files to fill in}
+% \vspace{-0.5em}
+The starter code for this assignment can be found at
+\vspace{-0.3em}
+\begin{itemize}[itemsep=0pt, topsep=0pt, parsep=0pt, partopsep=0pt]
+    \item \verb|cs285/agents/model_based_agent.py|: up to (and including) \verb|update_statistics|.
+    \item \verb|cs285/scripts/run_hw4.py|: everything except for \verb|collect_mbpo_rollout| at the top of the file.
+\end{itemize}
+\vspace{-0.5em}
+
+\subsection{What command to run}
+% \vspace{-0.5em}
+ \begin{lstlisting}[language=bash,breaklines=true]
+  python cs285/scripts/run_hw4.py -cfg experiments/mpc/halfcheetah_0_iter.yaml
+\end{lstlisting}
+\vspace{-0.5em}
+
+This config will only run the first iteration without actually evaluating the policy, meaning it will only train the
+ensemble of dynamics models. The code will produce plots inside your logdir that illustrate the full learning
+curve of the dynamics models. For the first command, the loss should go below 0.2 by iteration 500.
+
+Modify  \verb|experiments/mpc/halfcheetah_0_iter.yaml| to change some hyperparameters. Try at least
+two other configurations of hyperparameters that affect dynamics model training (e.g., number of layers,
+hidden size, or learning rate).
+\vspace{-0.5em}
+
+\subsection{What to submit:}
+% \vspace{-0.5em}
+For this question, submit the learning curve for 3 runs total: the initial run with provided
+hyperparameters as well as 2 of your own.
+Note that for these learning curves, we intend for you to just copy the png images produced by the code.
+\vspace{-0.5em}
+
+
+\begin{figure}[htb]
+\centering
+\begin{minipage}{0.235\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p1/layers1_h32.png}
+    \subcaption{1 Layer}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.235\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p1/layers2_h32.png}
+    \subcaption{2 Layers}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.235\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p1/layers3_h32.png}
+    \subcaption{3 Layers}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.235\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p1/layers4_h32.png}
+    \subcaption{4 Layers}
+\end{minipage}
+\caption{Effect of Number of Layers (hidden size = 32)}
+\vspace{-1em}
+\end{figure}
+\vspace{-0.5em}
+
+\begin{figure}[htb]
+\centering
+\resizebox{0.75\textwidth}{!}{%
+\begin{minipage}{0.31\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p1/layers1_h32.png}
+    \subcaption{Hidden = 32}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.31\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p1/layers1_h64.png}
+    \subcaption{Hidden = 64}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.31\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{hw4_text/figures/p1/layers1_h128.png}
+    \subcaption{Hidden = 128}
+\end{minipage}
+}
+\caption{Effect of Hidden Size (1 layer)}
+\vspace{-1.5em}
+\end{figure}
+
+
+\newpage
