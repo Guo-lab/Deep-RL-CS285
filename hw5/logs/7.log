@@ -1,0 +1,11 @@
+=========================================================
+4.3 Data Ablations - CQL on Medium maze with different dataset sizes
+------------------------------------------
+Testing dataset sizes: 1000, 5000, 10000, 20000
+
+Running CQL with 1000 samples on Medium maze...
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassMedium-v0_cql0.1_11-01-2026_05-11-25
+########################
+Using GPU id 0
+[CQL] Initialized with alpha=0.1, temperature=1.0

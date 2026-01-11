@@ -1,0 +1,63 @@
+=========================================================
+RND Exploration on Medium maze with different dataset sizes
+------------------------------------------
+Testing dataset sizes: 1000, 5000, 10000, 20000
+
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_explore_PointmassMedium-v0_rnd1.000001_11-01-2026_03-52-31
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassMedium-v0 environment using algorithm rnd.
+The results will be stored in datasets/.
+======================================================================
+
+Using GPU id 0
+Saved dataset to datasets/pointmass_medium_rnd1000.pkl
+Saved final heatmap to exploration_visualization/PointmassMedium-v0_rnd1.000001.png
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_explore_PointmassMedium-v0_rnd1.0000001_11-01-2026_03-52-37
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassMedium-v0 environment using algorithm rnd.
+The results will be stored in datasets/.
+======================================================================
+
+Using GPU id 0
+Saved dataset to datasets/pointmass_medium_rnd5000.pkl
+Saved final heatmap to exploration_visualization/PointmassMedium-v0_rnd1.0000001.png
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_explore_PointmassMedium-v0_rnd1.00000001_11-01-2026_03-52-58
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassMedium-v0 environment using algorithm rnd.
+The results will be stored in datasets/.
+======================================================================
+
+Using GPU id 0
+Saved dataset to datasets/pointmass_medium_rnd10000.pkl
+Saved final heatmap to exploration_visualization/PointmassMedium-v0_rnd1.00000001.png
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_explore_PointmassMedium-v0_rnd1.000000001_11-01-2026_03-53-41
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassMedium-v0 environment using algorithm rnd.
+The results will be stored in datasets/.
+======================================================================
+
+Using GPU id 0
+Saved dataset to datasets/pointmass_medium_rnd20000.pkl
+Saved final heatmap to exploration_visualization/PointmassMedium-v0_rnd1.000000001.png
+
+Experiment 6 completed!

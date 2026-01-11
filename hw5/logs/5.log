@@ -1,0 +1,27 @@
+=========================================================
+4.2 AWAC and IQL Comparison @ TODO (5) - (7) and (8) - (11)
+------------------------------------------
+Running AWAC and IQL on available environments
+
+Running IQL on Medium environment...
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassMedium-v0_iql0.99_temp10.0_10-01-2026_14-40-51
+########################
+Using GPU id 0
+Running AWAC on Medium environment...
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassMedium-v0_awac10.0_10-01-2026_14-55-34
+########################
+Using GPU id 0
+Running IQL on Hard environment...
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassHard-v0_iql0.99_temp10.0_10-01-2026_15-05-59
+########################
+Using GPU id 0
+Running AWAC on Hard environment...
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassHard-v0_awac10.0_10-01-2026_15-21-13
+########################
+Using GPU id 0
+
+Experiment 5 completed!

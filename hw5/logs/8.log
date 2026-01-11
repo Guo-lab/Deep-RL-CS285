@@ -1,0 +1,115 @@
+=========================================================
+5.0 Online Fine-tuning on Hard environment
+------------------------------------------
+Running CQL, AWAC, DQN, and IQL with offline→online finetuning
+
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_finetune_PointmassHard-v0_awac10.0_11-01-2026_07-39-02
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassHard-v0 environment using algorithm awac.
+The results will be stored in datasets.
+======================================================================
+
+Using GPU id 0
+Loaded offline dataset with 20000 transitions
+Actor Grad Norm: 0.624867702225443
+Saved dataset to datasets/pointmass_hard_rnd20000.pkl
+Saved final heatmap to exploration/PointmassHard-v0_awac10.0.png
+Namespace(config_file='experiments/finetuning/pointmass_hard_dqn_finetune.yaml', eval_interval=10000, visualize_interval=1000, num_eval_trajectories=10, seed=1, no_gpu=False, which_gpu=0, log_interval=1, use_reward=False, dataset_dir='datasets')
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_finetune_pointmass_hard_dqn_PointmassHard-v0_s64_l2_d0.95_doubleq_11-01-2026_08-05-22
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassHard-v0 environment using algorithm dqn.
+The results will be stored in datasets.
+======================================================================
+
+Using GPU id 0
+Loaded offline dataset with 320000 transitions
+Saved dataset to datasets/pointmass_hard_rnd20000.pkl
+Saved final heatmap to exploration/pointmass_hard_dqn_PointmassHard-v0_s64_l2_d0.95_doubleq.png
+Namespace(config_file='experiments/finetuning/pointmass_hard_iql_finetune.yaml', eval_interval=10000, visualize_interval=1000, num_eval_trajectories=10, seed=1, no_gpu=False, which_gpu=0, log_interval=1, use_reward=False, dataset_dir='datasets')
+
+================================================================================
+DQN Config - agent_kwargs:
+================================================================================
+  make_critic                   : <callable: function>
+  make_optimizer                : <callable: function>
+  make_lr_schedule              : <callable: function>
+  discount                      : 0.95
+  target_update_period          : 300
+  clip_grad_norm                : None
+  use_double_q                  : True
+  env_name                      : PointmassHard-v0
+  total_steps                   : 400000
+  batch_size                    : 128
+  hidden_size                   : 64
+  num_layers                    : 2
+  learning_rate                 : 0.0003
+================================================================================
+
+
+================================================================================
+AWAC Config - agent_kwargs:
+================================================================================
+  make_critic                   : <callable: function>
+  make_optimizer                : <callable: function>
+  make_lr_schedule              : <callable: function>
+  discount                      : 0.95
+  target_update_period          : 300
+  clip_grad_norm                : None
+  use_double_q                  : True
+  temperature                   : 10.0
+  make_actor                    : <callable: function>
+  make_actor_optimizer          : <callable: function>
+  total_steps                   : 400000
+  actor_hidden_size             : 128
+  actor_num_layers              : 2
+  actor_learning_rate           : 0.0003
+================================================================================
+
+
+================================================================================
+IQL Config - agent_kwargs:
+================================================================================
+  make_critic                   : <callable: function>
+  make_optimizer                : <callable: function>
+  make_lr_schedule              : <callable: function>
+  discount                      : 0.95
+  target_update_period          : 300
+  clip_grad_norm                : None
+  use_double_q                  : True
+  temperature                   : 10.0
+  make_actor                    : <callable: function>
+  make_actor_optimizer          : <callable: function>
+  expectile                     : 0.99
+  make_value_critic             : <callable: function>
+  make_value_critic_optimizer   : <callable: function>
+  total_steps                   : 400000
+  expectile                     : 0.99
+  hidden_size                   : 64
+  num_layers                    : 2
+  learning_rate                 : 0.0003
+================================================================================
+
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_finetune_PointmassHard-v0_iql0.99_temp10.0_11-01-2026_08-20-19
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassHard-v0 environment using algorithm iql.
+The results will be stored in datasets.
+======================================================================
+
+Using GPU id 0
+Loaded offline dataset with 620000 transitions
+Actor Grad Norm: 0.3457055751006307

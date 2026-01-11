@@ -1,0 +1,11 @@
+base_config: "awac"
+env_name: "PointmassHard-v0"
+exp_name: "pointmass_hard_awac"
+total_steps: 300000
+offline_steps: 100000
+dataset_name: "pointmass_hard_rnd10000"
+
+temperature: 10.0
+
+hidden_size: 64
+num_layers: 2

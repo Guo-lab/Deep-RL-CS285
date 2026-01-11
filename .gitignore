@@ -4,5 +4,7 @@
 
 /hw3/data/humanoid
 
+/hw5/data
+
 *.pyc
 __pycache__/

@@ -1,0 +1,62 @@
+=========================================================
+4.1 CQL Alpha Sweep (Medium environment)
+------------------------------------------
+Testing alpha values: 0, 0.1, 0.5, 1.0, 5.0, 10.0
+
+Backed up original config to experiments/offline/pointmass_medium_cql.yaml.backup
+
+------------------------------------------------------
+Running CQL with alpha=0
+------------------------------------------------------
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassMedium-v0_cql0_10-01-2026_10-36-02
+########################
+Using GPU id 0
+[CQL] Initialized with alpha=0, temperature=1.0
+
+------------------------------------------------------
+Running CQL with alpha=0.1
+------------------------------------------------------
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassMedium-v0_cql0.1_10-01-2026_10-39-05
+########################
+Using GPU id 0
+[CQL] Initialized with alpha=0.1, temperature=1.0
+
+------------------------------------------------------
+Running CQL with alpha=0.5
+------------------------------------------------------
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassMedium-v0_cql0.5_10-01-2026_10-42-10
+########################
+Using GPU id 0
+[CQL] Initialized with alpha=0.5, temperature=1.0
+
+------------------------------------------------------
+Running CQL with alpha=1.0
+------------------------------------------------------
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassMedium-v0_cql1.0_10-01-2026_10-45-20
+########################
+Using GPU id 0
+[CQL] Initialized with alpha=1.0, temperature=1.0
+
+------------------------------------------------------
+Running CQL with alpha=5.0
+------------------------------------------------------
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassMedium-v0_cql5.0_10-01-2026_10-48-31
+########################
+Using GPU id 0
+[CQL] Initialized with alpha=5.0, temperature=1.0
+
+------------------------------------------------------
+Running CQL with alpha=10.0
+------------------------------------------------------
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_offline_PointmassMedium-v0_cql10.0_10-01-2026_10-51-43
+########################
+Using GPU id 0
+[CQL] Initialized with alpha=10.0, temperature=1.0
+
+Restored original config

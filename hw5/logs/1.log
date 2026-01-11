@@ -1,0 +1,47 @@
+==========================================================
+3.1 Random Policy
+----------------------------------------------
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_explore_PointmassEasy-v0_random_10-01-2026_03-14-34
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassEasy-v0 environment using algorithm random.
+The results will be stored in datasets/.
+======================================================================
+
+Using GPU id 0
+Saved dataset to datasets/pointmass_easy_random.pkl
+Saved final heatmap to exploration_visualization/PointmassEasy-v0_random.png
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_explore_PointmassMedium-v0_random_10-01-2026_03-14-40
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassMedium-v0 environment using algorithm random.
+The results will be stored in datasets/.
+======================================================================
+
+Using GPU id 0
+Saved dataset to datasets/pointmass_medium_random.pkl
+Saved final heatmap to exploration_visualization/PointmassMedium-v0_random.png
+########################
+logging outputs to  /home/siqi/Desktop/homework_fall2023-main/hw5/cs285/scripts/../../data/hw5_explore_PointmassHard-v0_random_10-01-2026_03-14-45
+########################
+
+======================================================================
+Exploration
+
+Generating the dataset for the PointmassHard-v0 environment using algorithm random.
+The results will be stored in datasets/.
+======================================================================
+
+Using GPU id 0
+Saved dataset to datasets/pointmass_hard_random.pkl
+Saved final heatmap to exploration_visualization/PointmassHard-v0_random.png
+
+Experiment 1 completed!
