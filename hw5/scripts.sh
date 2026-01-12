@@ -201,9 +201,6 @@ case $EXPERIMENT in
         echo "------------------------------------------"
         echo "Running CQL, AWAC, DQN, and IQL with offline→online finetuning"
         echo ""
-        # python ./cs285/scripts/run_hw5_finetune.py \
-        #         -cfg experiments/finetuning/pointmass_hard_cql_finetune.yaml \
-        #         --dataset_dir datasets
 
         python ./cs285/scripts/run_hw5_finetune.py \
                 -cfg experiments/finetuning/pointmass_hard_awac_finetune.yaml \

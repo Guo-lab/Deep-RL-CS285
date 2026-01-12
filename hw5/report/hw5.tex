@@ -607,8 +607,26 @@ Report results as evaluation returns, clearly indicating the point at which onli
 With online fine-tuning, your policy should be able to (stably) reach high reward (at least -20) on \verb+PointmassHard-v0+.
 
 
-Fine-tuning improves further after offline RL converged to be stable.
 
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/Screenshot from 2026-01-11 22-55-10.png}
+    \caption*{Evaluation Return}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/Screenshot from 2026-01-11 22-55-25.png}
+    \caption*{Q Values}
+\end{minipage}
+\vspace{-0.3em}
+\caption{Online fine-tuning results on PointmassHard-v0 environment for different offline RL algorithms (AWAC, CQL, IQL, and DQN). The 100k indicates the transition from offline training to online fine-tuning. After the transition, all algorithms show rapid improvement in evaluation returns, with DQN achieving the highest performance (-40 to -60 range). Q-values stabilize after fine-tuning begins.}
+\label{fig:online_finetuning}
+\end{figure}
+
+Fine-tuning further improves further after offline RL converged to be stable.
 
 %%=============================================================================
 % \section{Submitting the code and experiment runs}

@@ -3,7 +3,7 @@ env_name: "PointmassHard-v0"
 exp_name: "pointmass_hard_dqn"
 total_steps: 300000
 offline_steps: 100000
-dataset_name: "pointmass_hard_rnd10000" # The dataset from RND.
+dataset_name: "pointmass_hard_rnd" # The dataset from RND.
 
 hidden_size: 64
 num_layers: 2

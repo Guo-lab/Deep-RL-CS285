@@ -3,7 +3,7 @@ env_name: "PointmassHard-v0"
 exp_name: "pointmass_hard_awac"
 total_steps: 300000
 offline_steps: 100000
-dataset_name: "pointmass_hard_rnd10000"
+dataset_name: "pointmass_hard_rnd"
 
 temperature: 10.0
 
