@@ -37,6 +37,7 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
 
     # make the gym environment
     env = config["make_env"]()
+    epsilon = None
     exploration_schedule = config.get("exploration_schedule", None)
     discrete = isinstance(env.action_space, gym.spaces.Discrete)
 
@@ -53,13 +54,25 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
 
     observation = None
 
-    # Load offline dataset first to determine buffer size
+    # Replay buffer, make it large enough for dataset + online data
+    replay_buffer = ReplayBuffer(capacity=config["total_steps"])
+
+    """
+    By first loading an offline dataset and taking a fixed number of training steps
+    with an offline RL algorithm of one choice (IQL, CQL, or AWAC) and then switching
+    to online learning while keeping all of the data in the dataset
+    to initialize the replay buffer.
+    """
     with open(os.path.join(args.dataset_dir, f"{config['dataset_name']}.pkl"), "rb") as f:
         dataset = pickle.load(f)
 
-    # Replay buffer - make it large enough for dataset + online data
-    buffer_capacity = max(dataset.size + config["total_steps"], config["total_steps"])
-    replay_buffer = ReplayBuffer(capacity=buffer_capacity)
+    # replay_buffer.initialize_with_dataset(dataset)
+    replay_buffer.load_dataset(dataset)
+
+    dataset_size = len(dataset)
+
+    print(f"Loaded offline dataset with {dataset.size} transitions")
+    print(f"Replay buffer capacity: {replay_buffer.max_size}")
 
     observation = env.reset()
 
@@ -68,26 +81,16 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
     num_offline_steps = config["offline_steps"]
     num_online_steps = config["total_steps"] - num_offline_steps
 
-    """
-    By first loading an offline dataset and taking a fixed number of training steps
-    with an offline RL algorithm of one choice (IQL, CQL, or AWAC) and then switching
-    to online learning while keeping all of the data in the dataset
-    to initialize the replay buffer.
-    """
-    # Load dataset into replay buffer
-    replay_buffer.load_dataset(dataset)
-    print(f"Loaded offline dataset with {dataset.size} transitions")
-    print(f"Replay buffer capacity: {buffer_capacity}")
-
-    for step in tqdm.trange(config["total_steps"], dynamic_ncols=True):
+    for step in tqdm.trange(1, config["total_steps"] + 1, dynamic_ncols=True):
         # (12) TODO(student): Borrow code from another online training script here.
         # Only run the online training loop after `num_offline_steps` steps.
 
         # Online finetuning phase (AFTER offline_steps)
-        if step >= num_offline_steps:
+        if step > num_offline_steps:
             # Get action with exploration
             if exploration_schedule is not None:
-                epsilon = exploration_schedule.value(step - num_offline_steps)
+                # ConstantSchedule is used in this hw, so step makes no difference.
+                epsilon = exploration_schedule.value(step)
                 action = agent.get_action(observation, epsilon)
             else:
                 epsilon = None
@@ -114,10 +117,6 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
             else:
                 observation = next_observation
 
-        else:
-            # Offline phase - no environment interaction
-            epsilon = None
-
         # Main training loop
         batch = replay_buffer.sample(config["batch_size"])
 
@@ -127,7 +126,7 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
         update_info = agent.update(
             batch["observations"],
             batch["actions"],
-            batch["rewards"] * (1 if config.get("use_reward", False) else 0),
+            batch["rewards"],  # use normal rewards here!
             batch["next_observations"],
             batch["dones"],
             step,
@@ -164,7 +163,8 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
                 logger.log_scalar(np.max(ep_lens), "eval/ep_len_max", step)
                 logger.log_scalar(np.min(ep_lens), "eval/ep_len_min", step)
 
-        if step % args.visualize_interval == 0 and len(recent_observations) > 0:
+        # log exploration trajectories
+        if step % args.visualize_interval == 0 and step > num_offline_steps:
             env_pointmass: Pointmass = env.unwrapped
             observations = np.stack(recent_observations)
             recent_observations = []
@@ -175,15 +175,29 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
                 "eval",
             )
 
-    # Save the final dataset
-    dataset_file = os.path.join(args.dataset_dir, f"{config['dataset_name']}.pkl")
-    with open(dataset_file, "wb") as f:
-        pickle.dump(replay_buffer, f)
-        print("Saved dataset to", dataset_file)
+    # average of the last eval
+    print(f"Average eval return: {np.mean(returns)}")
+
+    # # Save the final dataset
+    # dataset_file = os.path.join(args.dataset_dir, f"{config['dataset_name']}.pkl")
+    # with open(dataset_file, "wb") as f:
+    #     pickle.dump(replay_buffer, f)
+    #     print("Saved dataset to", dataset_file)
+
+    # render last `dataset_size` step exploration
+    last_step_idxs = (
+        np.arange(replay_buffer.size - dataset_size, replay_buffer.size)
+        % replay_buffer.max_size
+    )
+    fig = visualize(env_pointmass, agent, replay_buffer.observations[last_step_idxs])
+    fig.suptitle(f"Last {dataset_size} state coverage")
+    filename = os.path.join("exploration_visualization", f"finetune_{config['log_name']}.png")
+    fig.savefig(filename)
+    print("Saved final heatmap to", filename)
 
     # Render final heatmap
     fig = visualize(env_pointmass, agent, replay_buffer.observations[: config["total_steps"]])
-    fig.suptitle("State coverage")
+    fig.suptitle(f"State coverage")
     filename = os.path.join("exploration", f"{config['log_name']}.png")
     fig.savefig(filename)
     print("Saved final heatmap to", filename)
@@ -215,12 +229,16 @@ def main():
     parser.add_argument("--use_reward", action="store_true")
     parser.add_argument("--dataset_dir", type=str, required=True)
 
+    parser.add_argument("--env_name", type=str, default="")
+    parser.add_argument("--dataset_name", type=str, default="")
+
     args = parser.parse_args()
-    print(args)
+    print(args)  # show hyperparameters
 
     # create directory for logging
     logdir_prefix = "hw5_finetune_"  # keep for autograder
 
+    extra_args = {"env_name": args.env_name, "dataset_name": args.dataset_name}
     config = make_config(args.config_file)
     logger = make_logger(logdir_prefix, config)
 
